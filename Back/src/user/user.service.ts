@@ -21,6 +21,12 @@ export class UserService{
         private readonly authRepository: Repository<AuthEntity>,
     ){}
 
+    // Método para buscar un usuario por correo electrónico
+    async findOneByEmail(email: string): Promise<UserEntity | undefined> {
+        return await this.userRepository.findOne({ where: { email } });
+    }
+
+
     async addNewUser(createUserDto: CreateUserDto): Promise<UserEntity> {
         const { role, password, ...userData } = createUserDto;
     
