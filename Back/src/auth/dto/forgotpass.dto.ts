@@ -1,11 +1,12 @@
-import { IsEmail} from "class-validator";
+import { IsEmail, IsNotEmpty} from "class-validator";
 import { ArgsType, Field } from "@nestjs/graphql";
 
 @ArgsType()
-export class ForgorPassDto{
+export class ForgotPassDto{
 
     @Field()
     @IsEmail()
-    email: string;
+    @IsNotEmpty()
+    email: string; //correo electrónico del usuario
 
 }

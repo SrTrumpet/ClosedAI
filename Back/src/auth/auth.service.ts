@@ -15,6 +15,10 @@ import { Repository } from "typeorm";
 import { AuthResponse } from "./entity/authresponse.entity";
 import { UserRoles } from "src/user/enums/user-roles.enums"; // Asegúrate de importar UserRoles
 
+import { v4 as uuidv4 } from 'uuid'; // Importa para generar una nueva contraseña aleatoria
+import { MailService } from 'src/mail/mail.service'; // Asegúrate de tener un servicio de correo
+import { ForgotPassDto } from "./dto/forgotpass.dto";
+
 
 @Injectable()
 export class AuthService{
@@ -24,6 +28,7 @@ export class AuthService{
         private readonly jwtService: JwtService,
         @InjectRepository(AuthEntity)
         private readonly authRepository : Repository<AuthEntity>,
+        private readonly mailService: MailService // Añade el servicio de correo
     ) {}
 
      // Método para registrar un nuevo usuario
@@ -86,9 +91,36 @@ export class AuthService{
         } as AuthResponse
     }
 
+    // Método para "Olvidar Contraseña"
+    async forgotPassword(forgotPasswordDto: ForgotPassDto): Promise<string> {
+        const { email } = forgotPasswordDto;
+
+        // Verifica si el correo está registrado
+        const user = await this.userService.findOneByEmail(email);
+        if (!user) {
+            throw new NotFoundException('Correo no encontrado');
+        }
+
+        // Genera una nueva contraseña aleatoria
+        const newPassword = uuidv4(); // Genera una nueva contraseña aleatoria
+
+        // Hashea la nueva contraseña
+        const hashedPassword = await bcryptjs.hash(newPassword, 10);
+
+        // Actualiza la contraseña en la base de datos
+        await this.userService.updateUserPassword(user.id, hashedPassword);
+
+        // Envía la nueva contraseña al correo electrónico del usuario
+        await this.mailService.sendMail(email, 'Nueva contraseña', `Su nueva contraseña es: ${newPassword}`);
+
+        return 'Se ha enviado una nueva contraseña a su correo electrónico';
+    }
+
     //Agregar service de register
     //conseguirInformacionUsaurio
     //conseguirRol
     //actualizarInformacion
     //findByNames
+
+
 }

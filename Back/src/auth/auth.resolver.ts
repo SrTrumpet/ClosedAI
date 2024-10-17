@@ -3,7 +3,7 @@ import { Resolver, Args, Mutation, Query, Context } from "@nestjs/graphql";
 import { LoginDto } from "./dto/login.dto";
 import { RegisterDto } from "./dto/register.dto"; // Importa el nuevo DTO
 
-import { ForgorPassDto } from "./dto/forgotpass.dto";
+import { ForgotPassDto } from "./dto/forgotpass.dto";
 import { AuthResponse } from "./entity/authresponse.entity";
 
 import { AuthService } from "./auth.service";
@@ -22,6 +22,10 @@ export class AuthResolver {
         return this.authService.register(registerDto);
     }
 
+    @Mutation(returns => String)
+    async forgotPassword(@Args('forgotPasswordDto') forgotPasswordDto: ForgotPassDto): Promise<string> {
+        return this.authService.forgotPassword(forgotPasswordDto);
+    }
 
     //Find User by Name
     //actualizar Informacion

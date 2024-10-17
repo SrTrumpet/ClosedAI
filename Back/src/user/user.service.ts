@@ -23,7 +23,7 @@ export class UserService{
 
     // Método para buscar un usuario por correo electrónico
     async findOneByEmail(email: string): Promise<UserEntity | undefined> {
-        return await this.userRepository.findOne({ where: { email } });
+        return this.userRepository.findOne({ where: { email } });
     }
 
 
@@ -114,5 +114,9 @@ export class UserService{
         return await this.userRepository.find({
             where: { role: UserRoles.Student },
         });
+    }
+
+    async updateUserPassword(userId: number, newPassword: string): Promise<void> {
+        await this.userRepository.update(userId, { password: newPassword });
     }
 }
