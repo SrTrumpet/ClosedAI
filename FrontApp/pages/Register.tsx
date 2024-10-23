@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { Text, TextInput, View, TouchableOpacity, Alert } from 'react-native';
+import { useMutation } from "@apollo/client";
+import { REGISTRO, CREAR_USUARIO } from "../graphql/mutations/index";
+import { clientUser } from '../graphql/apollo/apolloClient';
 import tw from 'twrnc';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-// import { useMutation } from '@apollo/client';
-// import { REGISTER } from '../graphql/mutations/user';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { RootStackParamList } from './types';
+import * as SecureStore from 'expo-secure-store';
 
-// Tipado de la navegación
 type RegisterScreenProp = StackNavigationProp<RootStackParamList, 'Register'>;
 
 const Register: React.FC = () => {
@@ -17,39 +18,51 @@ const Register: React.FC = () => {
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
   const [passVerifi, setPassVerifi] = useState('');
+  const [register, { loading }] = useMutation(REGISTRO, {client: clientUser});
 
-  const navigation = useNavigation<RegisterScreenProp>(); // Tipar la navegación
+  const navigation = useNavigation<RegisterScreenProp>();
 
-  // const [register, { loading, error }] = useMutation(REGISTER, {
-  //   onCompleted: () => {
-  //     // Mostrar el Alert antes de redirigir
-  //     Alert.alert('Éxito!', 'Te has registrado correctamente.', [
-  //       {
-  //         text: 'Ok',
-  //         onPress: () => navigation.navigate('Login'), // Redirigir a la página de login
-  //       },
-  //     ]);
-  //   },
-  //   onError: (e) => {
-  //     console.log('Error al registrar:', e);
-  //     Alert.alert('Error', 'No se pudo completar el registro. Intenta de nuevo.');
-  //   },
-  // });
+  const handleRegister = async (nombre: string, apellidos: string, email: string, pass: string) => {
+    try {
+      const { data } = await register({
+        variables: {
+          firstName: nombre,
+          lastName: apellidos,
+          email: email,
+          password: pass,
+          role: 'user'
+        }
+      });
+      const token = data.register.token;
+      console.log('Token:', token);
+      SecureStore.setItemAsync('authToken', token);
+      Alert.alert('Éxito!', 'Te has registrado correctamente.', [
+        {
+          text: 'Ok',
+          onPress: () => navigation.navigate('Login'),
+        },
+      ]);
+    } catch (error: any) {
+      console.error('Error completo:', error);
+      Alert.alert('Error', error.message || 'Error al intentar registrarse');
+    }
+  }  
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     if (pass !== passVerifi) {
       Alert.alert('Error', 'Las contraseñas no coinciden.');
       return;
     }
 
-    // Simular un registro exitoso
     Alert.alert('Éxito!', 'Te has registrado correctamente.', [
       {
         text: 'Ok',
-        onPress: () => navigation.navigate('Login'), // Redirigir a la página de login
+        onPress: () => navigation.navigate('Login'),
       },
     ]);
-
+    console.log('Name:', nombre, 'Last Name:', apellidos, 'Email:', email, 'Password:', pass);
+    event.preventDefault();
+    handleRegister(nombre, apellidos, email, pass);
     // try {
     //   await register({
     //     variables: {

@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { Text, TextInput, View, TouchableOpacity, Alert } from 'react-native';
+import { useMutation } from '@apollo/client';
+import { RECUPERAR_CONTRASENA } from '../graphql/mutations/index';
 import tw from 'twrnc';
 import Spinner from 'react-native-loading-spinner-overlay';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from './types'; // Asegúrate de que este archivo exista y esté correctamente configurado
-
-// Comenta las importaciones relacionadas con Apollo Client y GraphQL si no las necesitas
-// import { useMutation } from '@apollo/client';
-// import { FORGOT_PASS } from '../graphql/mutations/user';
-
+import { RootStackParamList } from './types';
+import { clientUser } from '../graphql/apollo/apolloClient';
+import * as SecureStore from 'expo-secure-store';
 
 const ForgotPass: React.FC = () => {
   const [email, setEmail] = useState('');
+  const [forgotPass, { loading, error }] = useMutation(RECUPERAR_CONTRASENA, { client: clientUser });
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   // const [forgotPass, { loading, error }] = useMutation(FORGOT_PASS, {
@@ -30,13 +30,12 @@ const ForgotPass: React.FC = () => {
   //   },
   // });
 
-  const handleSubmit = async () => {
+  const handleForgot = async (email: string) => {
     if (!email) {
       Alert.alert('Error', 'Por favor, ingresa un correo válido.');
       return;
     }
 
-    // Simular el proceso de envío de correo
     Alert.alert('Éxito', 'Tu nueva contraseña fue enviada a tu correo', [
       {
         text: 'Ok',
@@ -44,15 +43,34 @@ const ForgotPass: React.FC = () => {
       },
     ]);
 
-    // try {
-    //   await forgotPass({
-    //     variables: {
-    //       email: email,
-    //     },
-    //   });
-    // } catch (e) {
-    //   console.log('Error al intentar recuperar la contraseña.');
-    // }
+   try {
+      await forgotPass({
+        variables: {
+          email: email,
+        },
+      });
+    } catch (e) {
+      console.log('Error al intentar recuperar la contraseña.');
+    }
+  }
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    if (!email) {
+      Alert.alert('Error', 'Por favor, ingresa un correo válido.');
+      return;
+    }
+
+    Alert.alert('Éxito', 'Tu nueva contraseña fue enviada a tu correo', [
+      {
+        text: 'Ok',
+        onPress: () => navigation.navigate('Login'),
+      },
+    ]);
+
+    console.log('Email:', email);
+    event.preventDefault();
+    handleForgot(email);
+
   };
 
   return (

@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { Text, TextInput, View, TouchableOpacity, Alert, Platform } from 'react-native';
+import { useMutation } from "@apollo/client";
+import { INICIO_SESION } from "../graphql/mutations/index";
 import tw from 'twrnc';
 import Spinner from 'react-native-loading-spinner-overlay'; 
+import { clientUser } from '../graphql/apollo/apolloClient';
+import * as SecureStore from 'expo-secure-store';
+
 // Solo importar toast si estás en la web
 let toast: any;
 if (Platform.OS === 'web') {
@@ -12,52 +17,48 @@ if (Platform.OS === 'web') {
 const Login: React.FC<{ navigation: any }> = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [login, { loading }] = useMutation(INICIO_SESION, {client: clientUser});
+
+  const handleLogin = async (email: string, pass: string) => {
+    try {
+      const { data } = await login({
+        variables: {
+          email: email,
+          password: pass
+        }
+      });
+      const token = data.login.token;
+      console.log('Token:', token);
+      SecureStore.setItemAsync('authToken', token);
+      if (Platform.OS === 'web') {
+        toast.success('¡Éxito! Inicio de Sesión correcto');
+      } else {
+        Alert.alert('¡Éxito!', 'Inicio de Sesión correcto', [
+          {
+            text: 'Ok',
+            onPress: () => navigation.navigate('HomeLogin'),
+          },
+        ]);
+      }
+    } catch (error: any) {
+      console.error('Error completo:', error);
+      if (Platform.OS === 'web') {
+        toast.error('Email o contraseña incorrectos');
+      } else {
+        Alert.alert('Error', error.message || 'Email o contraseña incorrectos');
+      }
+    }
+  };
   
-
-const handleLogin = (email: string, password: string) => {
-  const defaultEmail = 'cristian@gmail.com';
-  const defaultPassword = '123456789';
-
-  setLoading(true);
-
-  if (email === defaultEmail && password === defaultPassword) {
-    setLoading(false);
-    
-    if (Platform.OS === 'web') {
-      // Mostrar toast si es web
-      toast.success('¡Éxito! Inicio de Sesión correcto');
-    } else {
-      // Mostrar Alert si es móvil
-      Alert.alert('¡Éxito!', 'Inicio de Sesión correcto', [
-        {
-          text: 'Ok',
-          onPress: () => navigation.navigate('HomeLogin'),
-        },
-      ]);
-    }
-    
-  } else {
-    setLoading(false);
-
-    if (Platform.OS === 'web') {
-      toast.error('Error: Email o contraseña incorrectos');
-    } else {
-      Alert.alert('Error', 'Email o contraseña incorrectos');
-    }
-  }
-};
-
-
-  const handleSubmit = () => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     if (email.trim() === '' || pass.trim() === '') {
       Alert.alert('Error', 'Por favor, llena ambos campos');
       return;
     }
     console.log('Email:', email, 'Password:', pass); // Verifica los datos ingresados
+    event.preventDefault();
     handleLogin(email, pass);
   };
-
 
   return (
     <View style={tw`flex-1 bg-[#95D5B2] justify-center items-center`}>
@@ -65,7 +66,7 @@ const handleLogin = (email: string, password: string) => {
       
       <View style={tw`bg-[#1B4332] w-80 p-6 shadow-lg rounded-xl flex flex-col gap-4 justify-center`}>
         <Text style={tw`bg-[#1B4332] text-white text-center text-5xl font-bold py-4 rounded-xl`}>
-        CloseIA
+        Colegio Bajos del Cerro Pequeño
       </Text>
         <Text style={tw`text-3xl text-white text-center underline font-semibold`}>Login</Text>
 
