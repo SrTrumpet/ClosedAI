@@ -1,140 +1,192 @@
-import { Injectable, UnauthorizedException, BadRequestException, NotFoundException } from "@nestjs/common";
-import { jwtConstants } from "./constant/jwt.constants";
-
-import { JwtService } from "@nestjs/jwt";
-import { UserService } from "src/user/user.service";
-import { RegisterDto } from "./dto/register.dto"; // Importa el nuevo DTO
-import { MailService } from "src/mail/mail.service"; // Asegúrate de importar MailService
-import { ForgotPassDto } from "./dto/forgotpass.dto";
-import { LoginDto } from "./dto/login.dto";
-import { ResetPasswordDto } from "./dto/resetPassword.dto";
-
-import * as bcryptjs from "bcryptjs";
+// Nest
+import { Injectable, UnauthorizedException, BadRequestException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { AuthEntity } from "./entity/auth.entity";
-import { UserRoles } from "src/user/enums/user-roles.enums"; // Asegúrate de importar UserRoles
-
-
 import { Repository } from "typeorm";
+// JWT
+import { JwtService } from "@nestjs/jwt";
+// Entity
+import { AuthEntity } from "./entity/auth.entity";
+// Service
+import { UserService } from "src/user/user.service";
+// DTOs
+import { LoginDto } from "./dto/login.dto";
+import { ForgotPassDto } from "./dto/forgotpass.dto";
+import { RegisterDto } from "./dto/register.dto";
+// Herramientas
+import * as bcryptjs from "bcryptjs";
+import * as nodemailer from 'nodemailer';
+import { randomBytes } from 'crypto';
+// Respuesta
 import { AuthResponse } from "./entity/authresponse.entity";
+// Enums
+import { UserRoles } from "src/user/enums/user-roles.enums";
+import { ChangePasswordDto } from "./dto/change-password";
 
 @Injectable()
-export class AuthService{
+export class AuthService {
 
     constructor(
         private readonly userService: UserService,
         private readonly jwtService: JwtService,
         @InjectRepository(AuthEntity)
         private readonly authRepository: Repository<AuthEntity>,
-        private readonly mailService: MailService, // Inyecta MailService aquí
     ) {}
 
-    async login({ email, password }: LoginDto){
+    // Método de inicio de sesión
+    async login({ email, password }: LoginDto) {
+        // Busca al usuario por su email
         const user = await this.userService.findOneByEmail(email);
 
-        if(!user){
-            throw new UnauthorizedException("Email no valido");
+        // Si el usuario no existe, lanza una excepción de no autorizado
+        if (!user) {
+            throw new UnauthorizedException("Email no válido");
         }
 
-        const auth = await this.authRepository.findOne({where: {idUser: user.id}});
+        // Busca las credenciales de autenticación del usuario en el repositorio
+        const auth = await this.authRepository.findOne({ where: { idUser: user.id } });
         if (!auth) {
             throw new UnauthorizedException("Usuario sin credenciales de autenticación");
         }
 
+        // Verifica si la contraseña proporcionada es válida
         const isPasswordValid = await bcryptjs.compare(password, auth.password);
         if (!isPasswordValid) {
             throw new UnauthorizedException("Contraseña o email no válido");
         }
 
-        const payload = { email: user.email, id: user.id, name: user.firstName, lastName: user.lastName};
+        // Genera el token JWT con el ID del usuario
+        const payload = { id: user.id };
         const token = await this.jwtService.signAsync(payload);
 
+        // Devuelve el token y la información del usuario
         return {
-            message: "Inicio de sesion exitoso",
-            token
-        } as AuthResponse
-    }
-
-    //Agregar service de register
-    // Método para registrar un nuevo usuario
-    async register(registerDto: RegisterDto): Promise<AuthResponse> {
-        const { email, password, firstName, lastName, rut } = registerDto;
-    
-        // Verifica si el correo ya está en uso
-        const existingUser = await this.userService.findOneByEmail(email);
-        if (existingUser) {
-            throw new BadRequestException('El correo electrónico ya está en uso');
-        }
-    
-        // Hash de la contraseña para mayor seguridad
-        const hashedPassword = await bcryptjs.hash(password, 10);
-    
-        // Crea el nuevo usuario en la base de datos
-        const newUser = await this.userService.addNewUser({
-            firstName,
-            lastName,
-            rut, // Incluye el rut aquí
-            email,
-            password: hashedPassword, // Almacena la contraseña hasheada
-            role: UserRoles.Student, // Asigna un rol predeterminado
-        });
-    
-        // Genera un token JWT para el usuario
-        const payload = { email: newUser.email, id: newUser.id };
-        const token = await this.jwtService.signAsync(payload);
-    
-        // Devuelve la respuesta con el token, mensaje, email e id
-        return {
-            message: 'Registro exitoso',
+            message: "Inicio de sesión exitoso",
             token,
-            verificacion: true, // Establece el estado de verificación como true
-            email: newUser.email, // Incluye el correo electrónico
-            id: newUser.id, // Incluye el ID del usuario
+            role: user.role,
+            firstName: user.firstName,
+            id: user.id
         } as AuthResponse;
     }
-    
-    //olvido contraseña
 
-    // auth.service.ts
-    async forgotPassword(forgotPassDto: ForgotPassDto): Promise<string> {
-        const { email } = forgotPassDto;
+    // Método de registro de usuario
+    async register({ password, email, firstName, lastName, role, rut }: RegisterDto) {
 
-        // Busca al usuario por su correo electrónico
-        const user = await this.userService.findOneByEmail(email);
-        if (!user) {
-            throw new NotFoundException('No se encontró un usuario con ese correo');
+        // Verifica que el rol sea Teacher o Parents, de lo contrario lanza una excepción
+        if (role !== UserRoles.Teacher && role !== UserRoles.Parents) {
+            throw new BadRequestException('Solo profesores y padres pueden registrarse a través de esta función.');
         }
 
-        // Genera un token para la recuperación de contraseña
-        const token = await this.jwtService.signAsync({ id: user.id });
+        // Comprueba si el email ya está registrado
+        const user = await this.userService.findOneByEmail(email);
 
-        // Envía el correo de recuperación, pasando el email del usuario al MailService
-        await this.mailService.sendPasswordReset(user.email, token);
+        if (user) {
+            throw new BadRequestException("El email ya se encuentra registrado");
+        }
 
-        return 'Se ha enviado un enlace de recuperación de contraseña a tu correo';
+        // Agrega el nuevo usuario
+        await this.userService.addNewUser({
+            firstName,
+            lastName,
+            rut,
+            email,
+            password,
+            role
+        });
+
+        // Devuelve un mensaje de éxito
+        return {
+            message: "Usuario creado con éxito",
+        } as AuthResponse;
     }
 
-async resetPassword(resetPasswordDto: ResetPasswordDto): Promise<string> {
-    const { token, newPassword } = resetPasswordDto;
+    // Método de recuperación de contraseña
+    async forgotpass({ email }: ForgotPassDto) {
+        // Busca al usuario por su email
+        const user = await this.userService.findOneByEmail(email);
 
-    // Verifica el token y recupera la información del usuario
-    const payload = this.jwtService.verify(token); // Verifica el token
+        // Si el usuario no existe, lanza una excepción de no autorizado
+        if (!user) { 
+            throw new UnauthorizedException("Email no válido");
+        }
 
-    const user = await this.userService.findUserById(payload.id);
-    if (!user) {
-        throw new NotFoundException('Usuario no encontrado');
+        // Genera una nueva contraseña aleatoria
+        const newPass = randomBytes(8).toString('hex');
+        const hashedNewPass = await bcryptjs.hash(newPass, 10);
+
+        // Busca las credenciales de autenticación del usuario
+        const auth = await this.findByIdAuth(user.id);
+
+        // Actualiza la contraseña en la base de datos y envía un correo con la nueva contraseña
+        await this.userService.updatePassword(auth.id, hashedNewPass);
+        await this.sendPasswordResetEmail(email, newPass);
+
+        // Devuelve un mensaje de éxito
+        return {
+            message: "Contraseña reseteada. Verifica tu email"
+        } as AuthResponse;
     }
 
-    // Hashea la nueva contraseña
-    const hashedPassword = await bcryptjs.hash(newPassword, 10);
+    // Método que envía un correo electrónico con la nueva contraseña
+    async sendPasswordResetEmail(email: string, newPassword: string) {
 
-    // Actualiza la contraseña en la base de datos
-    await this.authRepository.update({ idUser: user.id }, { password: hashedPassword });
+        // Configura el transportador de correo usando Gmail
+        let transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: 'marcapp.service@gmail.com',
+                pass: 'vgwe mwnv insd dmyw'
+            }
+        });
 
-    return 'Contraseña actualizada exitosamente';
-}
-    //conseguirInformacionUsaurio
-    //conseguirRol
-    //actualizarInformacion
-    //findByNames
+        // Define las opciones del correo electrónico
+        const mailOptions = {
+            from: '"MarcApp" <marcapp.service@gmail.com>',
+            to: email,
+            subject: 'Tu nueva contraseña', 
+            text: `Tu nueva contraseña es: ${newPassword}`,
+            html: `
+                <html>
+                    <body>
+                        <div style="font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; color: #333;">
+                            <h2>Hola,</h2>
+                            <p>Hemos restablecido tu contraseña. Aquí tienes tu nueva contraseña para acceder a <strong>MarcApp</strong>:</p>
+                            <p style="font-size: 18px; color: #555;">
+                                <strong>Contraseña:</strong> <span style="background-color: #f0f0f0; padding: 8px 12px; border-radius: 4px; font-weight: bold;">${newPassword}</span>
+                            </p>
+                            <p>Te recomendamos cambiar esta contraseña por una propia tan pronto como inicies sesión.</p>
+                            <p>Si no has solicitado un restablecimiento de contraseña, por favor ignora este correo o ponte en contacto con nosotros.</p>
+                            <footer>
+                                <p>Saludos cordiales,</p>
+                                <p>Equipo de <strong>MarcApp</strong></p>
+                            </footer>
+                        </div>
+                    </body>
+                </html>
+            `
+        };
+        // Envía el correo electrónico
+        await transporter.sendMail(mailOptions);
+    }
+
+    // Busca credenciales de autenticación por el ID de usuario
+    async findByIdAuth(userId: number) {
+        return await this.authRepository.findOneBy({ idUser: userId });
+    }
+
+    // Método para cambiar la contraseña del usuario autenticado
+    async changePassword(token, { newPassword }: ChangePasswordDto) {
+
+        // Busca las credenciales de autenticación por el ID del token
+        const auth = await this.findByIdAuth(token.id);
+        // Hashea la nueva contraseña
+        const hashedNewPass = await bcryptjs.hash(newPassword, 10);
+
+        // Actualiza la contraseña en la base de datos
+        await this.userService.updatePassword(auth.id, hashedNewPass);
+
+        // Devuelve un mensaje de éxito
+        return {
+            message: "Contraseña reseteada correctamente"
+        } as AuthResponse;
+    }
 }
