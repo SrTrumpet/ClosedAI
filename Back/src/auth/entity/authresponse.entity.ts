@@ -18,6 +18,15 @@ export class AuthResponse {
     firstName: string;
 
     @Field()
+    lastName: string;
+
+    @Field()
+    rut: string;
+
+    @Field()
+    email: string;
+
+    @Field()
     id: number;
 
     @Field()

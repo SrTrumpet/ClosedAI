@@ -64,6 +64,9 @@ export class AuthService {
             token,
             role: user.role,
             firstName: user.firstName,
+            lastName: user.lastName,
+            rut: user.rut,
+            email: user.email,
             id: user.id,
             isChangePassword: auth.isChangePass
         } as AuthResponse;

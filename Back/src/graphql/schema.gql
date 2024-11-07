@@ -25,6 +25,9 @@ type AuthResponse {
   verificacion: Boolean!
   role: String!
   firstName: String!
+  lastName: String!
+  rut: String!
+  email: String!
   id: Float!
   isChangePassword: Boolean!
 }

@@ -75,7 +75,7 @@ const Register: React.FC = () => {
         variables: {
           firstName: nombre,
           lastName: apellidos,
-          rut: rut, // Eliminar formato antes de enviar
+          rut: rut,
           email: email,
           role: role,
           password: pass,

@@ -7,7 +7,7 @@ import {
   
   // Enlace HTTP para las solicitudes GraphQL
   const httpLink = createHttpLink({
-    uri: "https://auction-reported-incentive-mud.trycloudflare.com/graphql",  // Ajusta esto a tu URL del servidor GraphQL
+    uri: "http://192.168.43.94:3000/graphql",  // Ajusta esto a tu URL del servidor GraphQL
   });
   
   // Middleware para agregar el token en las solicitudes
