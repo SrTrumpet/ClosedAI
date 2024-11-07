@@ -10,4 +10,16 @@ export class AuthResponse {
 
     @Field()
     verificacion:boolean;
+
+    @Field()
+    role : string;
+
+    @Field()
+    firstName: string;
+
+    @Field()
+    id: number;
+
+    @Field()
+    isChangePassword: boolean;
 }
