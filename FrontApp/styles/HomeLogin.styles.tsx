@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#1B4332',
     textAlign: 'center',
-    marginTop: 70,
+    marginTop: 0,
   },
 });
 

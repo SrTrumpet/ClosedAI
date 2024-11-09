@@ -49,9 +49,6 @@ function HomeLogin() {
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.headerText}>Colegio Bajos del Cerro Pequeño</Text>
-        </View>
         <Text style={styles.title}>
           Bienvenido, {userName}!
         </Text>
@@ -76,11 +73,11 @@ function HomeLogin() {
             </Text>
             <View style={styles.buttonContainer}>
               {renderButton('Ver y actualizar datos personales', 'user', () => navigation.navigate('DatosUsuario' as never))}
-              {renderButton('Ver los datos de tus hijos/pupilos', 'child', () => {/* onPress handler */})}
-              {renderButton('Ver calificaciones', 'graduation-cap', () => {/* onPress handler */})}
-              {renderButton('Ver asistencias', 'calendar-check-o', () => {/* onPress handler */})}
-              {renderButton('Ver hoja de vida', 'file-text-o', () => {/* onPress handler */})}
-              {renderButton('Ver y enviar solicitudes y reclamos', 'envelope', () => {/* onPress handler */})}
+              {renderButton('Ver los datos de tus hijos/pupilos', 'child', () => {navigation.navigate('DatosHijos' as never)})}
+              {renderButton('Ver calificaciones', 'graduation-cap', () => {navigation.navigate('StudentGrades' as never)})}
+              {renderButton('Ver asistencias', 'calendar-check-o', () => {navigation.navigate('StudentAttendance' as never)})}
+              {renderButton('Ver hoja de vida', 'file-text-o', () => {navigation.navigate('AcademicRecord' as never)})}
+              {renderButton('Ver y enviar solicitudes y reclamos', 'envelope', () => {navigation.navigate('Suggestions' as never)})}
             </View>
           </>
         )}

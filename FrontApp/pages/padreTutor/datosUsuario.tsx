@@ -127,9 +127,6 @@ function DatosUsuario() {
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
         <View style={styles.container}>
-          <View style={styles.header}>
-            <Text style={styles.headerText}>Ver perfil</Text>
-          </View>
           <Text style={styles.subtitle}>Información personal</Text>
           {renderEditableInfo('user', 'Nombre', tempUserName, isEditingName, setIsEditingName, setTempUserName)}
           {renderEditableInfo('user', 'Apellido', tempUserLastName, isEditingLastName, setIsEditingLastName, setTempUserLastName)}
