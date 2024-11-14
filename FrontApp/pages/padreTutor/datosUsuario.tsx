@@ -34,6 +34,9 @@ function DatosUsuario() {
         const rut = await SecureStore.getItemAsync('userRut');
         const email = await SecureStore.getItemAsync('userEmail');
         const role = await SecureStore.getItemAsync('userRole');
+        const token = await SecureStore.getItemAsync('authToken');
+        const pass = await SecureStore.getItemAsync('userPass');
+        console.log('Datos recuperados en datosUsuario:', { name, lastName, rut, email, role, token, pass });
 
         setUserName(name || '');
         setUserLastName(lastName || '');
@@ -97,13 +100,18 @@ function DatosUsuario() {
           value={typeof value === 'string' ? value : ''}
           onChangeText={setTempValue}
           onBlur={() => setIsEditing(false)}
+          editable={userRole !== 'admin'}
         />
       ) : (
-        <Text style={styles.infoText}>{label}: {value}</Text>
+        <Text style={styles.infoText}>
+          {label}: {value}
+        </Text>
       )}
-      <TouchableOpacity onPress={() => setIsEditing(true)} style={styles.editIconContainer}>
-        <Icon name="pencil" size={20} color="#6a874d" style={styles.editIcon} />
-      </TouchableOpacity>
+      {userRole !== 'admin' && (
+        <TouchableOpacity onPress={() => setIsEditing(true)} style={styles.editIconContainer}>
+          <Icon name="pencil" size={20} color="#6a874d" style={styles.editIcon} />
+        </TouchableOpacity>
+      )}
     </View>
   );
 

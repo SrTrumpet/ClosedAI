@@ -11,6 +11,7 @@
   "dependencies": {
     "@apollo/client": "^3.11.8",
     "@expo/metro-runtime": "~3.2.3",
+    "@react-native-async-storage/async-storage": "^2.0.0",
     "@react-native-picker/picker": "^2.9.0",
     "@react-native/dev-middleware": "^0.76.0",
     "@react-navigation/native": "^6.1.18",

@@ -23,7 +23,8 @@ function HomeLogin() {
         const role = await SecureStore.getItemAsync('userRole');
         const email = await SecureStore.getItemAsync('userEmail');
         const token = await SecureStore.getItemAsync('authToken');
-        console.log('Datos recuperados:', { name, lastName, rut, email, role });
+        const pass = await SecureStore.getItemAsync('userPass');
+        console.log('Datos recuperados:', { name, lastName, rut, email, role, token, pass });
 
         setUserName(name || '');
         setUserLastName(lastName || '');
@@ -55,6 +56,18 @@ function HomeLogin() {
         <Text style={styles.subtitle}>
           Rol: {userRole}
         </Text>
+        {userRole === 'admin' && (
+          <>
+          <Text style={styles.subtitle}>
+            Este es el menú de administrador
+          </Text>
+          <View style={styles.buttonContainer}>
+            {renderButton('Ver datos personales', 'user', () => navigation.navigate('DatosUsuario' as never))}
+            {renderButton('Ver y modificar datos de estudiantes', 'child', () => {navigation.navigate('DatosHijos' as never)})}
+            {renderButton('Crear y modificar asignaturas', 'book', () => {navigation.navigate('Subjects' as never)})}
+          </View>
+        </>
+        )}
 
         {userRole === 'teacher' && (
           <>
@@ -63,6 +76,9 @@ function HomeLogin() {
           </Text>
           <View style={styles.buttonContainer}>
             {renderButton('Ver y actualizar datos personales', 'user', () => navigation.navigate('DatosUsuario' as never))}
+            {renderButton('Ver datos de estudiantes', 'child', () => {navigation.navigate('DatosHijos' as never)})}
+            {renderButton('Crear y modificar asignaturas', 'book', () => {navigation.navigate('Subjects' as never)})}
+            {renderButton('Agregar y desplegar asistencia', 'hand-stop-o', () => {navigation.navigate('Attendance' as never)})}
           </View>
         </>
         )}
@@ -75,7 +91,7 @@ function HomeLogin() {
               {renderButton('Ver y actualizar datos personales', 'user', () => navigation.navigate('DatosUsuario' as never))}
               {renderButton('Ver los datos de tus hijos/pupilos', 'child', () => {navigation.navigate('DatosHijos' as never)})}
               {renderButton('Ver calificaciones', 'graduation-cap', () => {navigation.navigate('StudentGrades' as never)})}
-              {renderButton('Ver asistencias', 'calendar-check-o', () => {navigation.navigate('StudentAttendance' as never)})}
+              {renderButton('Ver asistencias', 'calendar-check-o', () => {navigation.navigate('Attendance' as never)})}
               {renderButton('Ver hoja de vida', 'file-text-o', () => {navigation.navigate('AcademicRecord' as never)})}
               {renderButton('Ver y enviar solicitudes y reclamos', 'envelope', () => {navigation.navigate('Suggestions' as never)})}
             </View>

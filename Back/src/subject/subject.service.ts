@@ -48,8 +48,12 @@ export class SubjectService{
         const {name , newName , numberOfClasses} = updateSubjectDto;
         const subject = await this.subjectRepository.findOne({where: {name}});
 
-        if (newName !== undefined){
-            throw new BadRequestException('Asignatura con el nombre "${name}" no encontrado');
+        if (!subject) {
+            throw new BadRequestException(`Asignatura con el nombre "${name}" no encontrado`);
+        }
+
+        if (newName !== undefined) {
+            subject.name = newName;
         }
         if (numberOfClasses !== undefined){
             subject.numberOfClasses = numberOfClasses

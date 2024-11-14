@@ -24,8 +24,8 @@ export class SubjectResolver{
         return this.subjectService.deleteSubject(name);
     }
 
-    @Mutation(() => Boolean)
-    async updateSubject(@Args('createSubjectInput') updateSubject: UpdateSubjectDto): Promise<SubjectEntity>{
+    @Mutation(() => SubjectEntity)
+    async updateSubject(@Args('updateSubjectInput') updateSubject: UpdateSubjectDto): Promise<SubjectEntity>{
         return this.subjectService.updateSubject(updateSubject);
     }
 

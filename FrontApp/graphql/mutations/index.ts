@@ -38,17 +38,17 @@ mutation ForgotPass($email: String!) {
 `;  
   
 export const CREAR_USUARIO = gql`
-    mutation CreateUser($createUserDto: CreateUserDto!, $rut: String!) {
-        createUser(createUserDto: $createUserDto) {
-            email
-            firstName
-            id
-            role
-            rut
-        }
-        removeUser(rut: $rut)
+  mutation CreateUser($createUserDto: CreateUserDto!) {
+    createUser(createUserDto: $createUserDto) {
+      id
+      firstName
+      lastName
+      rut
+      email
+      role
     }
-`; 
+  }
+`;
 
 export const ACTUALIZAR_USUARIO = gql`
     mutation UpdateUser($rut: String!, $updateUserDto: UpdateUserDto!) {
@@ -62,19 +62,35 @@ export const ACTUALIZAR_USUARIO = gql`
     }
 `;
 
-export const CAMBIO_CONTRASENA = gql`
-    mutation ChangePassword($newPassword: String!) {
-        changePassword(newPassword: $newPassword) {
-            token
-            message
-            verificacion
-            role
-            firstName
-            lastName
-            rut
-            email
-            id
-            isChangePassword
-        }
+export const CAMBIAR_CONTRASENA = gql`
+  mutation ChangePassword($newPassword: String!) {
+    changePassword(newPassword: $newPassword) {
+      message
     }
+  }
+`;
+
+export const CREAR_ASIGNATURA = gql`
+  mutation Mutation($createSubjectInput: CreateSubjectDto!) {
+    createSubject(createSubjectInput: $createSubjectInput) {
+      isCreateSubject
+    }
+  }
+`;
+
+export const ACTUALIZAR_ASIGNATURA = gql`
+  mutation Mutation($updateSubjectInput: UpdateSubjectDto!) {
+    updateSubject(updateSubjectInput: $updateSubjectInput) {
+      id
+      name
+      numberOfClasses
+      idTeacher
+    }
+  }
+`;
+
+export const REGISTRAR_ASISTENCIA = gql`
+  mutation TakeAsist($createAsistInput: CreateAsistDto!) {
+    takeAsist(createAsistInput: $createAsistInput)
+  }
 `;

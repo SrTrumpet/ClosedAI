@@ -4,8 +4,9 @@ import * as SecureStore from 'expo-secure-store';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styles from '../../styles/padreTutor/datosUsuario.styles';
 import { ACTUALIZAR_USUARIO } from "../../graphql/mutations/index";
+import { GET_USERS } from '../../graphql/queries/index';
 import { clientUser } from '../../graphql/apollo/apolloClient';
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { useNavigation } from '@react-navigation/native';
 
 function AcademicRecord() {
@@ -23,8 +24,11 @@ function AcademicRecord() {
   const [isEditingLastName, setIsEditingLastName] = useState(false);
   const [isEditingEmail, setIsEditingEmail] = useState(false);
 
-  const [changeData, { loading }] = useMutation(ACTUALIZAR_USUARIO, { client: clientUser });
+  //const [changeData, { loading }] = useMutation(ACTUALIZAR_USUARIO, { client: clientUser });
   const navigation = useNavigation();
+
+  const {data, loading, error} = useQuery(GET_USERS, {client: clientUser});
+  console.log("INFO:", data);
 
   useEffect(() => {
     const fetchUserData = async () => {

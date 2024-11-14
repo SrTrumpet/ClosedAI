@@ -106,7 +106,7 @@ type Mutation {
     """The name of the subject to delete."""
     name: String!
   ): Boolean!
-  updateSubject(createSubjectInput: UpdateSubjectDto!): Boolean!
+  updateSubject(updateSubjectInput: UpdateSubjectDto!): SubjectEntity!
 }
 
 input CreateUserDto {

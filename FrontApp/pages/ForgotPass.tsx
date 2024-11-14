@@ -15,21 +15,6 @@ const ForgotPass: React.FC = () => {
   const [forgotPass, { loading, error }] = useMutation(RECUPERAR_CONTRASENA, { client: clientUser });
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  // const [forgotPass, { loading, error }] = useMutation(FORGOT_PASS, {
-  //   onCompleted: () => {
-  //     Alert.alert('Éxito', 'Tu nueva contraseña fue enviada a tu correo', [
-  //       {
-  //         text: 'Ok',
-  //         onPress: () => navigation.navigate('Login'),
-  //       },
-  //     ]);
-  //   },
-  //   onError: (e) => {
-  //     console.log('Correo no encontrado', e);
-  //     Alert.alert('Error', 'Correo no encontrado');
-  //   },
-  // });
-
   const handleForgot = async (email: string) => {
     if (!email) {
       Alert.alert('Error', 'Por favor, ingresa un correo válido.');

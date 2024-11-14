@@ -25,7 +25,7 @@ const Login: React.FC<{ navigation: any }> = ({ navigation }) => {
       });
       
       const { token, firstName, lastName, rut, role } = data.login;
-      console.log('Datos de usuario:', { firstName, lastName, rut, email, pass, role });
+      console.log('Datos de usuario:', { firstName, lastName, rut, email, pass, role, token });
   
       await SecureStore.setItemAsync('authToken', token);
       await SecureStore.setItemAsync('userName', String(firstName));
@@ -33,6 +33,7 @@ const Login: React.FC<{ navigation: any }> = ({ navigation }) => {
       await SecureStore.setItemAsync('userRut', String(rut));
       await SecureStore.setItemAsync('userEmail', String(email));
       await SecureStore.setItemAsync('userRole', String(role));
+      await SecureStore.setItemAsync('userPass', String(pass));
   
       Alert.alert('¡Éxito!', 'Inicio de Sesión correcto', [
         {

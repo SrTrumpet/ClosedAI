@@ -10,9 +10,10 @@ import DatosUsuario from './pages/padreTutor/datosUsuario';
 import ChangePassword from './pages/padreTutor/changePassword'
 import DatosHijos from './pages/padreTutor/datosHijos';
 import StudentGrades from './pages/padreTutor/studentGrades';
-import StudentAttendance from './pages/padreTutor/studentAttendance';
 import AcademicRecord from './pages/padreTutor/academicRecord';
 import Suggestions from './pages/padreTutor/suggestions';
+import Subjects from './pages/teacher/Subjects';
+import Attendance from './pages/teacher/Attendance';
 
 const Stack = createStackNavigator();
 
@@ -29,9 +30,10 @@ export default function App() {
         <Stack.Screen name="ChangePassword" component={ChangePassword} options={{title: 'Cambiar Contraseña', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
         <Stack.Screen name="DatosHijos" component={DatosHijos} options={{title: 'Datos de los pupilos', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/> 
         <Stack.Screen name="StudentGrades" component={StudentGrades} options={{title: 'Calificaciones del estudiante', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
-        <Stack.Screen name="StudentAttendance" component={StudentAttendance} options={{title: 'Asistencia del estudiante', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
         <Stack.Screen name="AcademicRecord" component={AcademicRecord} options={{title: 'Expediente académico', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/> 
         <Stack.Screen name="Suggestions" component={Suggestions} options={{title: 'Sugerencias y reclamos', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
+        <Stack.Screen name="Subjects" component={Subjects} options={{title: 'Gestión de asignaturas', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
+        <Stack.Screen name="Attendance" component={Attendance} options={{title: 'Gestión de asistencia', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
       </Stack.Navigator>
       </NavigationContainer>
     </ApolloClientsContext.Provider>

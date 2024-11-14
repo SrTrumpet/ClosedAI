@@ -1,4 +1,3 @@
-// types.ts
 export type RootStackParamList = {
     Login: undefined;
     HomeLogin: undefined;
@@ -6,5 +5,10 @@ export type RootStackParamList = {
     Register: undefined;
     DatosUsuario: undefined;
     ChangePassword: undefined;
+    DatosHijos: undefined;
+    StudentGrades: undefined;
+    StudentAttendance: undefined;
+    AcademicRecord: undefined;
+    Suggestions: undefined;
   };
   
