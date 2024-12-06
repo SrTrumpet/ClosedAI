@@ -54,7 +54,7 @@ type NoticeEntity {
   id: Float!
   title: String!
   description: String!
-  imageUrl: String!
+  imageUrl: String
 }
 
 type NoticeResponse {
@@ -157,6 +157,7 @@ input CreateAsistItemDto {
   idUser: Float!
   idSubject: Float!
   asist: Float!
+  absences: Float!
 }
 
 input CreateSubjectDto {

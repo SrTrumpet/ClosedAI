@@ -69,11 +69,11 @@ export const OBTENER_INFO = gql`
 
 export const LISTAR_CURSOS = gql`
     query ListSubject {
-        listSubject {
-            name
-            numberOfClasses
-            id
-        }
+      listSubject {
+        id
+        name
+        numberOfClasses
+      }
     }
 `;
 
@@ -112,9 +112,46 @@ export const GET_ALL_STUDENTS = gql`
 export const FIND_BY_RUT = gql`
   query FindByRut($rut: String!) {
     findByRut(rut: $rut) {
-      firstName
-      id
-      lastName
+        id
+        firstName
+        lastName
+        rut
+        role
     }
   }
 `;
+
+
+export const GRADES_BY_SUBJECT_ID = gql`
+  query GradesBySubjectId($subjectId: Float!) {
+    gradesBySubjectId(subjectId: $subjectId) {
+      id
+      grade
+      studentId
+    }
+  }
+`;
+
+export const CREATE_NOTICE = gql`
+  mutation CreateNotice($title: String!, $description: String!, $imageUrl: String) {
+    createNotice(title: $title, description: $description, imageUrl: $imageUrl) {
+      isCreateNotice
+    }
+  }
+`;
+
+
+export const GET_ALL_NOTICES = gql`
+  query GetAllNotices {
+    getAllNotices {
+      id
+      title
+      description
+      imageUrl
+    }
+  }
+`;
+
+
+
+
