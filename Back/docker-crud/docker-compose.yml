@@ -10,7 +10,7 @@ services:
       MYSQL_USER: crud_db
       MYSQL_PASSWORD: root
     volumes:
-      - ../mysql:/var/lib/mysql
+      - db_data:/var/lib/mysql
     ports:
       - "3308:3306"
 volumes:

@@ -1,9 +1,23 @@
 import React, { useEffect, useState } from 'react';
-import { Text, View, StyleSheet, Alert, TouchableOpacity, ScrollView, GestureResponderEvent } from 'react-native';
+import { Text, View, TouchableOpacity, ScrollView, ImageBackground, FlatList, Modal, TextInput, Alert, GestureResponderEvent } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
+import * as ImagePicker from 'expo-image-picker';
+import { useQuery, useMutation } from '@apollo/client';
+import { clientUser } from '../graphql/apollo/apolloClient';
+import { CREAR_ANUNCIO } from '../graphql/mutations';
+import { GET_NEWS, GET_USER_BY_RUT } from '../graphql/queries';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styles from '../styles/HomeLogin.styles';
+
+interface News {
+  id: string;
+  title: string;
+  content: string;
+  publisher: string;
+  idUser: string;
+  createdAt: string;
+}
 
 function HomeLogin() {
   const [userName, setUserName] = useState('');
@@ -12,7 +26,21 @@ function HomeLogin() {
   const [userRole, setUserRole] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [userToken, setUserToken] = useState('');
+  const [userId, setUserId] = useState<string | null>(null);
   const navigation = useNavigation();
+
+  const [modalVisible, setModalVisible] = useState(false);
+  const [newTitle, setNewTitle] = useState('');
+  const [newDescription, setNewDescription] = useState('');
+  const [image, setImage] = useState<string>('');
+
+  const { data, loading, error, refetch } = useQuery(GET_NEWS, { client: clientUser });
+  const { data: userData, refetch: refetchUser } = useQuery(GET_USER_BY_RUT, {
+    variables: { rut: userRut },
+    client: clientUser,
+    skip: !userRut,
+  });
+  const [createNews] = useMutation(CREAR_ANUNCIO, { client: clientUser });
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -23,8 +51,7 @@ function HomeLogin() {
         const role = await SecureStore.getItemAsync('userRole');
         const email = await SecureStore.getItemAsync('userEmail');
         const token = await SecureStore.getItemAsync('authToken');
-        const pass = await SecureStore.getItemAsync('userPass');
-        console.log('Datos recuperados:', { name, lastName, rut, email, role, token, pass });
+        console.log('Datos recuperados:', { name, lastName, rut, email, role, token });
 
         setUserName(name || '');
         setUserLastName(lastName || '');
@@ -32,6 +59,10 @@ function HomeLogin() {
         setUserRole(role || '');
         setUserEmail(email || '');
         setUserToken(token || '');
+
+        if (rut) {
+          refetchUser();
+        }
       } catch (error) {
         console.error('Error al obtener datos de SecureStore:', error);
       }
@@ -40,12 +71,75 @@ function HomeLogin() {
     fetchUserData();
   }, []);
 
+  useEffect(() => {
+    if (userData && userData.findByRut) {
+      setUserId(userData.findByRut.id);
+    }
+  }, [userData]);
+
   const renderButton = (title: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined, iconName: string, onPress: ((event: GestureResponderEvent) => void) | undefined) => (
     <TouchableOpacity style={styles.button} onPress={onPress}>
       <Icon name={iconName} size={20} color="#fff" style={styles.buttonIcon} />
       <Text style={styles.buttonText}>{title}</Text>
     </TouchableOpacity>
   );
+
+  const renderAnnouncement = ({ item }: any) => (
+    <ImageBackground
+      source={{ uri: item.imageUrl || 'image' }}
+      style={styles.announcementCard}
+      resizeMode="cover"
+    >
+      <View style={styles.announcementOverlay}>
+        <Text style={styles.announcementTitle}>{item.title}</Text>
+        <Text style={styles.announcementDescription}>{item.description}</Text>
+      </View>
+    </ImageBackground>
+  );
+
+  const handleImagePicker = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      Alert.alert('Permiso requerido', 'Se necesita acceso a la galería para subir imágenes.');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.Images });
+    if (!result.canceled && result.assets?.length > 0) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
+  const handleCreateNews = async () => {
+    if (!newTitle || !newDescription) {
+      Alert.alert('Error', 'Por favor, completa todos los campos.');
+      return;
+    }
+
+    if (!userId) {
+      Alert.alert('Error', 'No se pudo obtener la ID del usuario.');
+      return;
+    }
+
+    try {
+      await createNews({
+        variables: {
+            title: newTitle,
+            description: newDescription,
+            imageUrl: image || 'image',
+          },
+      });
+      Alert.alert('Éxito', 'El anuncio ha sido creado.');
+      setModalVisible(false);
+      setNewTitle('');
+      setNewDescription('');
+      setImage('');
+      refetch(); // Refresh the list of announcements
+    } catch (err) {
+      Alert.alert('Error', 'No se pudo crear el anuncio.');
+      console.error(err);
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -56,6 +150,68 @@ function HomeLogin() {
         <Text style={styles.subtitle}>
           Rol: {userRole}
         </Text>
+
+        <Text style={styles.sectionTitle}>Tablero de Anuncios</Text>
+          {loading ? (
+            <Text>Cargando anuncios...</Text>
+          ) : data?.getAllNotices?.length === 0 ? (
+            <Text>No hay anuncios disponibles en este momento.</Text>
+          ) : error ? (
+            <Text>Error al cargar los anuncios</Text>
+          ) : (
+            <FlatList
+              data={data?.getAllNotices.slice().sort((a: News, b: News) => parseInt(b.id) - parseInt(a.id))}
+              renderItem={renderAnnouncement}
+              keyExtractor={(item) => item.id.toString()}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.announcementList}
+            />
+        )}
+
+        {(userRole === 'teacher' || userRole === 'admin') && (
+          <TouchableOpacity
+            style={styles.createAnnouncementButton}
+            onPress={() => setModalVisible(true)}
+          >
+            <Icon name="plus" size={20} color="#fff" />
+            <Text style={styles.createAnnouncementText}>Crear Anuncio</Text>
+          </TouchableOpacity>
+        )}
+
+        <Modal visible={modalVisible} transparent animationType="slide">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Crear Anuncio</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Título del anuncio"
+                value={newTitle}
+                onChangeText={setNewTitle}
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Descripción"
+                value={newDescription}
+                onChangeText={setNewDescription}
+              />
+              <TouchableOpacity style={styles.imageButton} onPress={handleImagePicker}>
+                <Text style={styles.imageButtonText}>
+                  {image ? 'Imagen seleccionada' : 'Seleccionar Imagen'}
+                </Text>
+              </TouchableOpacity>
+              <View style={styles.modalActions}>
+                <TouchableOpacity style={styles.cancelButton} onPress={() => setModalVisible(false)}>
+                  <Text style={styles.cancelButtonText}>Cancelar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.saveButton} onPress={handleCreateNews}>
+                  <Text style={styles.saveButtonText}>Guardar</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
         {userRole === 'admin' && (
           <>
           <Text style={styles.subtitle}>

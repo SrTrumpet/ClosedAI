@@ -65,3 +65,14 @@ export const GET_USER_BY_RUT = gql`
     }
   }
 `;
+
+export const GET_NEWS = gql`
+  query GetAllNotices {
+    getAllNotices {
+      id
+      title
+      description
+      imageUrl
+    }
+  }
+`;

@@ -94,3 +94,11 @@ export const REGISTRAR_ASISTENCIA = gql`
     takeAsist(createAsistInput: $createAsistInput)
   }
 `;
+
+export const CREAR_ANUNCIO = gql`
+  mutation CreateNotice($title: String!, $description: String!, $imageUrl: String) {
+    createNotice(title: $title, description: $description, imageUrl: $imageUrl) {
+      isCreateNotice
+    }
+  }
+`;

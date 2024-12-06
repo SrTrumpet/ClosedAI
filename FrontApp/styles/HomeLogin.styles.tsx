@@ -1,6 +1,36 @@
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
+  announcementAuthor: {
+    color: '#ccc',
+    fontSize: 12,
+  },
+  announcementCard: {
+    width: 300,
+    height: 200,
+    borderRadius: 10,
+    overflow: 'hidden',
+    marginRight: 15,
+    justifyContent: 'flex-end',
+  },
+  announcementDescription: {
+    color: '#ddd',
+    fontSize: 14,
+    marginVertical: 5,
+  },
+  announcementList: {
+    width: '100%',
+    marginVertical: 10,
+  },
+  announcementOverlay: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 10,
+  },
+  announcementTitle: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -23,6 +53,16 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
   },
+  cancelButton: {
+    backgroundColor: '#ccc',
+    padding: 10,
+    borderRadius: 5,
+    flex: 1,
+    marginRight: 10,
+  },
+  cancelButtonText: {
+    color: '#fff',
+  },
   container: {
     flex: 1,
     backgroundColor: '#d1f7ab',
@@ -35,6 +75,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 80,
+  },
+  createAnnouncementButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#6a874d',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginTop: 20,
+    alignSelf: 'center',
+  },
+  createAnnouncementText: {
+    color: '#fff',
+    fontSize: 16,
+    marginLeft: 10,
   },
   editIcon: {
     marginLeft: 10,
@@ -56,12 +111,67 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 20,
   },
+  imageButton: {
+    backgroundColor: '#6a874d',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 20,
+  },
+  imageButtonText: {
+    color: '#fff',
+  },
+  input: {
+    width: '100%',
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 15,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: '90%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  saveButton: {
+    backgroundColor: '#6a874d',
+    padding: 10,
+    borderRadius: 5,
+    flex: 1,
+  },
+  saveButtonText: {
+    color: '#fff',
+  },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 20,
     backgroundColor: '#d1f7ab',
+  },
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#1B4332',
+    marginVertical: 20,
   },
   subtitle: {
     fontSize: 20,
