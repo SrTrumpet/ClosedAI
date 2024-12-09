@@ -34,6 +34,10 @@ function HomeLogin() {
   const [newDescription, setNewDescription] = useState('');
   const [image, setImage] = useState<string>('');
 
+  const [notificationsVisible, setNotificationsVisible] = useState(false);
+  const [chatVisible, setChatVisible] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+
   const { data, loading, error, refetch } = useQuery(GET_NEWS, { client: clientUser });
   const { data: userData, refetch: refetchUser } = useQuery(GET_USER_BY_RUT, {
     variables: { rut: userRut },
@@ -142,13 +146,14 @@ function HomeLogin() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
+    <ScrollView contentContainerStyle={styles.scrollContainer}
+    onScroll={(e) => setScrollY(e.nativeEvent.contentOffset.y)}
+    scrollEventThrottle={16}
+    >
+      
       <View style={styles.container}>
         <Text style={styles.title}>
           Bienvenido, {userName}!
-        </Text>
-        <Text style={styles.subtitle}>
-          Rol: {userRole}
         </Text>
 
         <Text style={styles.sectionTitle}>Tablero de Anuncios</Text>
@@ -221,6 +226,7 @@ function HomeLogin() {
             {renderButton('Ver datos personales', 'user', () => navigation.navigate('DatosUsuario' as never))}
             {renderButton('Ver y modificar datos de estudiantes', 'child', () => {navigation.navigate('DatosHijos' as never)})}
             {renderButton('Crear y modificar asignaturas', 'book', () => {navigation.navigate('Subjects' as never)})}
+            {renderButton('Calificar estudiantes', 'check-square-o', () => {navigation.navigate('Grades' as never)})}
           </View>
         </>
         )}
@@ -235,7 +241,54 @@ function HomeLogin() {
             {renderButton('Ver datos de estudiantes', 'child', () => {navigation.navigate('DatosHijos' as never)})}
             {renderButton('Crear y modificar asignaturas', 'book', () => {navigation.navigate('Subjects' as never)})}
             {renderButton('Agregar y desplegar asistencia', 'hand-stop-o', () => {navigation.navigate('Attendance' as never)})}
+            {renderButton('Calificar estudiantes', 'check-square', () => {navigation.navigate('Grades' as never)})}
           </View>
+
+          <View style={[styles.floatingButtonContainer, { transform: [{ translateY: scrollY }] },]}>
+            <TouchableOpacity
+              style={[styles.floatingButton, { zIndex: 2 }]}
+              onPress={() => setNotificationsVisible(true)}
+            >
+              <Icon name="bell" size={24} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.floatingButton, { zIndex: 1 }]}
+              onPress={() => setChatVisible(true)}
+            >
+              <Icon name="comment" size={24} color="#fff" />
+            </TouchableOpacity>
+         </View>
+
+        <Modal visible={notificationsVisible} transparent animationType="slide">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Notificaciones</Text>
+              <Text>No tienes nuevas notificaciones.</Text>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setNotificationsVisible(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal visible={chatVisible} transparent animationType="slide">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Chat</Text>
+              <Text>No tienes mensajes nuevos.</Text>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setChatVisible(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
         </>
         )}
         {userRole === 'parents' && (
@@ -246,11 +299,56 @@ function HomeLogin() {
             <View style={styles.buttonContainer}>
               {renderButton('Ver y actualizar datos personales', 'user', () => navigation.navigate('DatosUsuario' as never))}
               {renderButton('Ver los datos de tus hijos/pupilos', 'child', () => {navigation.navigate('DatosHijos' as never)})}
-              {renderButton('Ver calificaciones', 'graduation-cap', () => {navigation.navigate('StudentGrades' as never)})}
               {renderButton('Ver asistencias', 'calendar-check-o', () => {navigation.navigate('Attendance' as never)})}
               {renderButton('Ver hoja de vida', 'file-text-o', () => {navigation.navigate('AcademicRecord' as never)})}
               {renderButton('Ver y enviar solicitudes y reclamos', 'envelope', () => {navigation.navigate('Suggestions' as never)})}
             </View>
+
+            <View style={[styles.floatingButtonContainer, { transform: [{ translateY: scrollY }] },]}>
+            <TouchableOpacity
+              style={[styles.floatingButton, { zIndex: 2 }]}
+              onPress={() => setNotificationsVisible(true)}
+            >
+              <Icon name="bell" size={24} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.floatingButton, { zIndex: 1 }]}
+              onPress={() => setChatVisible(true)}
+            >
+              <Icon name="comment" size={24} color="#fff" />
+            </TouchableOpacity>
+         </View>
+
+        <Modal visible={notificationsVisible} transparent animationType="slide">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Notificaciones</Text>
+              <Text>No tienes notificaciones.</Text>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setNotificationsVisible(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal visible={chatVisible} transparent animationType="slide">
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Chat</Text>
+              <Text>No tienes mensajes en tu historial.</Text>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setChatVisible(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
           </>
         )}
       </View>

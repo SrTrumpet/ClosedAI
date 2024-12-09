@@ -143,9 +143,7 @@ const Register: React.FC = () => {
           onChangeText={setPassVerifi}
           secureTextEntry
         />
-        <TouchableOpacity
-          onPress={handleSubmit}
-          style={tw`bg-[#95D5B2] rounded-xl text-2xl py-2 justify-center items-center mt-4`}
+        <TouchableOpacity onPress={handleSubmit} style={tw`bg-[#95D5B2] rounded-xl text-2xl py-2 justify-center items-center mt-4`}
         >
           <Text style={tw`text-white`}>Registrar</Text>
         </TouchableOpacity>

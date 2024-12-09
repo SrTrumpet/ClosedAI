@@ -57,7 +57,7 @@ export class AsistService{
         });
     
         if (!asistencias.length) {
-            throw new NotFoundException(`No se encontraron usuarios para el subject con id ${idSubject}`);
+            //throw new NotFoundException(`No se encontraron usuarios para el subject con id ${idSubject}`);
         }
     
         const userIds = asistencias.map(asistencia => asistencia.idUser);

@@ -102,3 +102,31 @@ export const CREAR_ANUNCIO = gql`
     }
   }
 `;
+
+export const CREATE_GRADE = gql`
+  mutation CreateGrade($createGradeDto: CreateGradeDto!) {
+    createGrade(createGradeDto: $createGradeDto) {
+      id
+      grade
+      studentId
+      subjectId
+    }
+  }
+`;
+
+export const UPDATE_GRADE = gql`
+  mutation UpdateGrade($id: Float!, $updateGradeDto: UpdateGradeDto!) {
+    updateGrade(id: $id, updateGradeDto: $updateGradeDto) {
+      id
+      grade
+      studentId
+      subjectId
+    }
+  }
+`;
+
+export const DELETE_GRADE = gql`
+  mutation DeleteGrade($id: Float!) {
+    deleteGrade(id: $id)
+  }
+`;

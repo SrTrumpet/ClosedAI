@@ -76,3 +76,25 @@ export const GET_NEWS = gql`
     }
   }
 `;
+
+export const GET_GRADES_BY_SUBJECT = gql`
+  query GradesBySubjectId($subjectId: Float!) {
+    gradesBySubjectId(subjectId: $subjectId) {
+      id
+      grade
+      studentId
+      subjectId
+    }
+  }
+`;
+
+export const GET_GRADES_BY_STUDENT_AND_SUBJECT = gql`
+  query GradesByStudentAndSubject($studentId: Float!, $subjectId: Float!) {
+    gradesByStudentAndSubject(studentId: $studentId, subjectId: $subjectId) {
+      id
+      grade
+      studentId
+      subjectId
+    }
+  }
+`;

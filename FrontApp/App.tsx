@@ -9,11 +9,11 @@ import HomeLogin from './pages/HomeLogin';
 import DatosUsuario from './pages/padreTutor/datosUsuario';
 import ChangePassword from './pages/padreTutor/changePassword'
 import DatosHijos from './pages/padreTutor/datosHijos';
-import StudentGrades from './pages/padreTutor/studentGrades';
 import AcademicRecord from './pages/padreTutor/academicRecord';
 import Suggestions from './pages/padreTutor/suggestions';
 import Subjects from './pages/teacher/Subjects';
 import Attendance from './pages/teacher/Attendance';
+import Grades from './pages/teacher/Grades';
 
 const Stack = createStackNavigator();
 
@@ -23,17 +23,17 @@ export default function App() {
       <NavigationContainer>
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Register" component={Register} />
+        <Stack.Screen name="Register" component={Register} options={{title: 'Registro', headerStyle: {backgroundColor: '#2d6a4f',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
         <Stack.Screen name="ForgotPass" component={ForgotPass} options={{ headerShown: false }}/>
         <Stack.Screen name="HomeLogin" component={HomeLogin} options={{title: 'Colegio Bajos del Cerro Pequeño', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
         <Stack.Screen name="DatosUsuario" component={DatosUsuario} options={{title: 'Ver perfil', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
         <Stack.Screen name="ChangePassword" component={ChangePassword} options={{title: 'Cambiar Contraseña', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
         <Stack.Screen name="DatosHijos" component={DatosHijos} options={{title: 'Datos de los pupilos', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/> 
-        <Stack.Screen name="StudentGrades" component={StudentGrades} options={{title: 'Calificaciones del estudiante', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
         <Stack.Screen name="AcademicRecord" component={AcademicRecord} options={{title: 'Expediente académico', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/> 
         <Stack.Screen name="Suggestions" component={Suggestions} options={{title: 'Sugerencias y reclamos', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
         <Stack.Screen name="Subjects" component={Subjects} options={{title: 'Gestión de asignaturas', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
         <Stack.Screen name="Attendance" component={Attendance} options={{title: 'Gestión de asistencia', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
+        <Stack.Screen name="Grades" component={Grades} options={{title: 'Calificaciones de estudiantes', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
       </Stack.Navigator>
       </NavigationContainer>
     </ApolloClientsContext.Provider>

@@ -62,6 +62,7 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     color: '#fff',
+    fontWeight: 'bold',
   },
   container: {
     flex: 1,
@@ -96,6 +97,26 @@ const styles = StyleSheet.create({
   },
   editIconContainer: {
     marginLeft: 'auto',
+  },
+  floatingButton: {
+    backgroundColor: '#007bff',
+    borderRadius: 30,
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+    zIndex: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+  },
+  floatingButtonContainer: {
+    position: 'absolute',
+    right: 20,
+    bottom: 120,
   },
   header: {
     width: '100%',
