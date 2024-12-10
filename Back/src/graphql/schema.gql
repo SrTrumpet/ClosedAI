@@ -2,21 +2,6 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type MessageEntity {
-  id: ID!
-  senderId: Float!
-  receiverId: Float!
-  content: String!
-  createdAt: DateTime!
-  sender: UserEntity!
-  receiver: UserEntity!
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
 type UserEntity {
   id: ID!
   firstName: String!
@@ -24,8 +9,6 @@ type UserEntity {
   rut: String!
   email: String!
   role: UserRoles!
-  sentMessages: [MessageEntity!]
-  receivedMessages: [MessageEntity!]
 }
 
 """The roles a user can have in the system"""
@@ -91,6 +74,32 @@ type GradeEntity {
   subjectId: Float!
 }
 
+"""Entity representing a form with questions"""
+type Form {
+  """Unique identifier of the form"""
+  id: ID!
+
+  """Title of the form"""
+  title: String!
+
+  """Optional description of the form"""
+  description: String
+
+  """List of questions in the form"""
+  questions: [String!]!
+
+  """Date when the form was created"""
+  createdAt: DateTime!
+
+  """Date when the form was last updated"""
+  updatedAt: DateTime
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Query {
   getAllNotices: [NoticeEntity!]!
 
@@ -108,7 +117,12 @@ type Query {
   gradesBySubjectId(subjectId: Float!): [GradeEntity!]!
   findGradeById(id: Float!): GradeEntity!
   getAllGrades: [GradeEntity!]!
-  getConversation(user1Id: Float!, user2Id: Float!): [MessageEntity!]!
+
+  """Fetch all forms"""
+  forms: [Form!]!
+
+  """Fetch a form by ID"""
+  form(id: ID!): Form
 }
 
 type Mutation {
@@ -145,7 +159,12 @@ type Mutation {
   createGrade(createGradeDto: CreateGradeDto!): GradeEntity!
   updateGrade(id: Float!, updateGradeDto: UpdateGradeDto!): GradeEntity!
   deleteGrade(id: Float!): Boolean!
-  sendMessage(createMessageInput: CreateMessageDto!): MessageEntity!
+
+  """Create a new form"""
+  createForm(createFormInput: CreateFormDto!): Form!
+
+  """Delete a form by ID"""
+  removeForm(id: ID!): Boolean!
 }
 
 input CreateUserDto {
@@ -196,12 +215,13 @@ input UpdateGradeDto {
   subjectId: Float
 }
 
-input CreateMessageDto {
-  senderId: Float!
-  receiverId: Float!
-  content: String!
-}
+input CreateFormDto {
+  """Title of the form"""
+  title: String!
 
-type Subscription {
-  messageSent(receiverId: Float!): MessageEntity!
+  """Optional description of the form"""
+  description: String
+
+  """List of questions in the form"""
+  questions: [String!]!
 }

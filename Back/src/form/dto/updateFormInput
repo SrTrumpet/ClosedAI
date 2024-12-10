@@ -1,0 +1,7 @@
+// src/forms/dto/update-form.dto.ts
+
+import { InputType, Field, PartialType } from '@nestjs/graphql';
+import { CreateFormDto } from './create-form.dto';
+
+@InputType({ description: 'Input type for updating an existing form' })
+export class UpdateFormInput extends PartialType(CreateFormDto) {}

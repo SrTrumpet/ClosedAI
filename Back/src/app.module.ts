@@ -1,4 +1,3 @@
-
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
@@ -11,7 +10,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { GradesModule } from './grades/grades.module';
 import { PubSub } from 'graphql-subscriptions';
-import { MessagesModule } from './messages/messages.module';
+import { FormsModule } from './form/forms.module';
 
 @Module({
   imports: [
@@ -21,7 +20,7 @@ import { MessagesModule } from './messages/messages.module';
     AsistModule,
     SubjectModule,
     GradesModule,
-    MessagesModule,
+    FormsModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
@@ -38,12 +37,17 @@ import { MessagesModule } from './messages/messages.module';
         path: join(process.cwd(), 'src', 'graphql', 'schema.gql'),
       },
       playground: true,
-      context: ({ req, connection }) => ({ 
+      context: ({ req, connection }) => ({
         req,
         ...(connection ? connection.context : {}),
       }),
+
+      // Configuración para WebSocket y suscripciones
       subscriptions: {
-        'graphql-ws': {
+        'graphql-ws': { // WebSocket GraphQL subscriptions (Apollo Server 3.x+)
+          path: '/graphql',
+        },
+        'subscriptions-transport-ws': { // Legacy WebSocket transport para compatibilidad
           path: '/graphql',
         },
       },
@@ -52,7 +56,7 @@ import { MessagesModule } from './messages/messages.module';
   providers: [
     {
       provide: 'PUB_SUB',
-      useValue: new PubSub(),
+      useValue: new PubSub(),  // Proveedor del PubSub para las suscripciones
     },
   ],
 })

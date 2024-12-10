@@ -7,21 +7,15 @@ async function bootstrap() {
   
   // Configuración CORS más específica
   app.enableCors({
-    origin: true, 
-    methods: ['GET', 'POST', 'OPTIONS'],
-    credentials: true,
-    allowedHeaders: [
-      'Content-Type', 
-      'Authorization', 
-      'Access-Control-Allow-Headers', 
-      'Origin', 
-      'X-Requested-With'
-    ],
+    origin: '*', // Permitir conexiones desde cualquier origen, ajusta según sea necesario
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Accept',
   });
 
-  // Añade soporte para WebSocket (necesario para suscripciones)
+  // Habilitar WebSocket para GraphQL
   app.useWebSocketAdapter(new WsAdapter(app));
 
+  // Escuchar en el puerto 3000
   await app.listen(3000);
 }
 bootstrap();
