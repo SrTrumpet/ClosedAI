@@ -14,6 +14,7 @@ import Suggestions from './pages/padreTutor/suggestions';
 import Subjects from './pages/teacher/Subjects';
 import Attendance from './pages/teacher/Attendance';
 import Grades from './pages/teacher/Grades';
+import Events from './pages/teacher/Events';
 
 const Stack = createStackNavigator();
 
@@ -34,6 +35,7 @@ export default function App() {
         <Stack.Screen name="Subjects" component={Subjects} options={{title: 'Gestión de asignaturas', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
         <Stack.Screen name="Attendance" component={Attendance} options={{title: 'Gestión de asistencia', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
         <Stack.Screen name="Grades" component={Grades} options={{title: 'Calificaciones de estudiantes', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
+        <Stack.Screen name="Events" component={Events} options={{title: 'Calendario de Eventos', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
       </Stack.Navigator>
       </NavigationContainer>
     </ApolloClientsContext.Provider>

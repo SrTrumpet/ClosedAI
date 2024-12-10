@@ -227,6 +227,7 @@ function HomeLogin() {
             {renderButton('Ver y modificar datos de estudiantes', 'child', () => {navigation.navigate('DatosHijos' as never)})}
             {renderButton('Crear y modificar asignaturas', 'book', () => {navigation.navigate('Subjects' as never)})}
             {renderButton('Calificar estudiantes', 'check-square-o', () => {navigation.navigate('Grades' as never)})}
+            {renderButton('Gestionar eventos', 'calendar', () => {navigation.navigate('Events' as never)})}
           </View>
         </>
         )}
@@ -242,6 +243,7 @@ function HomeLogin() {
             {renderButton('Crear y modificar asignaturas', 'book', () => {navigation.navigate('Subjects' as never)})}
             {renderButton('Agregar y desplegar asistencia', 'hand-stop-o', () => {navigation.navigate('Attendance' as never)})}
             {renderButton('Calificar estudiantes', 'check-square', () => {navigation.navigate('Grades' as never)})}
+            {renderButton('Agregar eventos', 'calendar', () => {navigation.navigate('Events' as never)})}
           </View>
 
           <View style={[styles.floatingButtonContainer, { transform: [{ translateY: scrollY }] },]}>
@@ -302,6 +304,7 @@ function HomeLogin() {
               {renderButton('Ver asistencias', 'calendar-check-o', () => {navigation.navigate('Attendance' as never)})}
               {renderButton('Ver hoja de vida', 'file-text-o', () => {navigation.navigate('AcademicRecord' as never)})}
               {renderButton('Ver y enviar solicitudes y reclamos', 'envelope', () => {navigation.navigate('Suggestions' as never)})}
+              {renderButton('Ver eventos', 'calendar', () => {navigation.navigate('Events' as never)})}
             </View>
 
             <View style={[styles.floatingButtonContainer, { transform: [{ translateY: scrollY }] },]}>
