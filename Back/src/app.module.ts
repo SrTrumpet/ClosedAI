@@ -1,3 +1,4 @@
+
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
@@ -9,7 +10,8 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { GradesModule } from './grades/grades.module';
-import { PubSub } from 'graphql-subscriptions'; // Para gestionar las suscripciones
+import { PubSub } from 'graphql-subscriptions';
+import { MessagesModule } from './messages/messages.module';
 
 @Module({
   imports: [
@@ -19,7 +21,7 @@ import { PubSub } from 'graphql-subscriptions'; // Para gestionar las suscripcio
     AsistModule,
     SubjectModule,
     GradesModule,
-    // Configuración de TypeORM para la conexión a la base de datos
+    MessagesModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
@@ -30,23 +32,28 @@ import { PubSub } from 'graphql-subscriptions'; // Para gestionar las suscripcio
       autoLoadEntities: true,
       synchronize: true,
     }),
-    // Configuración de GraphQL con suscripciones habilitadas
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: {
         path: join(process.cwd(), 'src', 'graphql', 'schema.gql'),
       },
       playground: true,
-      context: ({ req }) => ({ req }),
+      context: ({ req, connection }) => ({ 
+        req,
+        ...(connection ? connection.context : {}),
+      }),
       subscriptions: {
-        'subscriptions-transport-ws': {
+        'graphql-ws': {
           path: '/graphql',
         },
       },
     }),
   ],
   providers: [
-    PubSub, // Necesario para gestionar las suscripciones
+    {
+      provide: 'PUB_SUB',
+      useValue: new PubSub(),
+    },
   ],
 })
 export class AppModule {}

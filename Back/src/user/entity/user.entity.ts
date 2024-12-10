@@ -1,6 +1,7 @@
-import {Entity, PrimaryGeneratedColumn, Column} from 'typeorm';
-import {ObjectType, Field, ID} from '@nestjs/graphql';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { ObjectType, Field, ID } from '@nestjs/graphql';
 import { UserRoles } from '../enums/user-roles.enums';
+import { MessageEntity } from 'src/messages/entities/message.entity';
 
 @ObjectType()
 @Entity()
@@ -32,4 +33,13 @@ export class UserEntity {
     })
     @Field(() => UserRoles)
     role: UserRoles;
+
+    // Nuevas relaciones con mensajes
+    @OneToMany(() => MessageEntity, message => message.sender)
+    @Field(() => [MessageEntity], { nullable: true })
+    sentMessages: MessageEntity[];
+
+    @OneToMany(() => MessageEntity, message => message.receiver)
+    @Field(() => [MessageEntity], { nullable: true })
+    receivedMessages: MessageEntity[];
 }
