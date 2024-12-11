@@ -25,14 +25,37 @@ type AuthResponse {
   verificacion: Boolean!
   role: String!
   firstName: String!
+  lastName: String!
+  rut: String!
+  email: String!
   id: Float!
   isChangePassword: Boolean!
+}
+
+type CourseEntity {
+  id: ID!
+  nameCourse: String!
+  level: CourseLevels!
+
+  """Las asignaturas asociadas al curso"""
+  subjects: [SubjectEntity!]!
+}
+
+"""Son los niveles de enseñansa de los colegios"""
+enum CourseLevels {
+  Basica
+  Media
+  Kinder
+  PreKinder
 }
 
 """La entidad Subject que representa una asignatura"""
 type SubjectEntity {
   id: ID!
   name: String!
+
+  """El curso al que pertenece la asignatura"""
+  course: CourseEntity!
   numberOfClasses: Float!
   idTeacher: Float!
 }
@@ -74,6 +97,19 @@ type GradeEntity {
   subjectId: Float!
 }
 
+type SemesterEntity {
+  id: ID!
+  nameSemester: String!
+  startDate: DateTime!
+  endDate: DateTime!
+  deadline: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Query {
   getAllNotices: [NoticeEntity!]!
 
@@ -86,13 +122,23 @@ type Query {
 
   """Obtiene los usuarios y su asistencia por asignatura"""
   listUsersBySubject(idSubject: Float!): [UserWithAttendanceDto!]!
+
+  """Listar todas las asignaturas."""
   listSubject: [SubjectEntity!]!
+
+  """
+  Obtener todas las asignaturas por ID de profesor, incluyendo el nombre del curso.
+  """
+  getAllSubjectByIdTeacher(
+    """ID del profesor."""
+    idTeacher: Int!
+  ): [SubjectEntity!]!
   gradesByStudentId(studentId: Float!): [GradeEntity!]!
   gradesBySubjectId(subjectId: Float!): [GradeEntity!]!
   findGradeById(id: Float!): GradeEntity!
   getAllGrades: [GradeEntity!]!
-  gradesByStudentAndSubject(studentId: Float!, subjectId: Float!): [GradeEntity!]!
-  averageGradeByStudentAndSubject(studentId: Float!, subjectId: Float!): Float!
+  getAllCourse: [CourseEntity!]!
+  getAllSemester: [SemesterEntity!]!
 }
 
 type Mutation {
@@ -112,23 +158,48 @@ type Mutation {
   """Marca la asistencia de los estudiantes"""
   takeAsist(createAsistInput: CreateAsistDto!): Boolean!
 
-  """Create a new subject by providing the name and number of classes."""
+  """
+  Crear una nueva asignatura proporcionando el nombre y número de clases.
+  """
   createSubject(
     """
-    The input data for creating a new subject, including name and number of classes.
+    Datos de entrada para crear una nueva asignatura, incluyendo nombre y número de clases.
     """
     createSubjectInput: CreateSubjectDto!
   ): SubjectResponse!
 
-  """Remove a subject by its name. Returns true if deletion is successful."""
+  """
+  Crear una nueva asignatura como administrador proporcionando el nombre, número de clases, ID del curso y ID del profesor.
+  """
+  addNewSubjectAdmin(
+    """
+    Datos de entrada para que un administrador cree una nueva asignatura, incluyendo nombre, número de clases, ID del curso y ID del profesor.
+    """
+    createSubjectAdminInput: CreateSubjectAdminDto!
+  ): SubjectResponse!
+
+  """
+  Eliminar una asignatura por su nombre. Retorna true si la eliminación es exitosa.
+  """
   removeSubject(
-    """The name of the subject to delete."""
+    """El nombre de la asignatura a eliminar."""
     name: String!
   ): Boolean!
-  updateSubject(createSubjectInput: UpdateSubjectDto!): Boolean!
+
+  """Actualizar una asignatura proporcionando los campos necesarios."""
+  updateSubject(
+    """Datos de entrada para actualizar una asignatura."""
+    updateSubjectInput: UpdateSubjectDto!
+  ): SubjectEntity!
   createGrade(createGradeDto: CreateGradeDto!): GradeEntity!
   updateGrade(id: Float!, updateGradeDto: UpdateGradeDto!): GradeEntity!
   deleteGrade(id: Float!): Boolean!
+  createCourse(createCourseDto: CreateCourseDto!): Boolean!
+  deleteCourseDto(deleteCourseDto: DeleteCourseDto!): Boolean!
+  updateCourseDto(updateCourseDto: UpdateCourseDto!): Boolean!
+  createSemester(createSemesterDto: CreateSemesterDto!): Boolean!
+  deleteSemester(deleteSemesterDto: DeleteSemesterDto!): Boolean!
+  updateSemester(updateSemesterDto: UpdateSemesterDto!): Boolean!
 }
 
 input CreateUserDto {
@@ -154,18 +225,26 @@ input CreateAsistItemDto {
   idUser: Float!
   idSubject: Float!
   asist: Float!
-  absences: Float!
 }
 
 input CreateSubjectDto {
   name: String!
   numberOfClasses: Int
+  courseId: Int!
+}
+
+input CreateSubjectAdminDto {
+  name: String!
+  numberOfClasses: Int
+  courseId: Int!
+  idTeacher: Int!
 }
 
 input UpdateSubjectDto {
   name: String!
   newName: String
   numberOfClasses: Int
+  courseId: Int
 }
 
 input CreateGradeDto {
@@ -178,4 +257,40 @@ input UpdateGradeDto {
   grade: Float
   studentId: Float
   subjectId: Float
+}
+
+input CreateCourseDto {
+  nameCourse: String!
+  level: CourseLevels!
+}
+
+input DeleteCourseDto {
+  nameCourse: String!
+  level: CourseLevels!
+}
+
+input UpdateCourseDto {
+  nameCourse: String!
+  newName: String
+  level: CourseLevels!
+  newLevel: CourseLevels
+}
+
+input CreateSemesterDto {
+  nameSemester: String!
+  startDate: DateTime!
+  endDate: DateTime!
+  deadline: DateTime!
+}
+
+input DeleteSemesterDto {
+  nameSemester: String!
+}
+
+input UpdateSemesterDto {
+  nameSemester: String!
+  newNameSemester: String
+  startDate: DateTime
+  endDate: DateTime
+  deadline: DateTime
 }

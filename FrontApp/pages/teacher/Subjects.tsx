@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { View, TextInput, TouchableOpacity, Text, Alert, ScrollView } from 'react-native';
+import { View, TextInput, TouchableOpacity, Text, Alert, ScrollView, Modal } from 'react-native';
 import { useQuery, useMutation } from '@apollo/client';
 import styles from '../../styles/teacher/subjects.styles';
 import { clientUser } from '../../graphql/apollo/apolloClient';
 import { CREAR_ASIGNATURA, ACTUALIZAR_ASIGNATURA } from '../../graphql/mutations';
-import { GET_SUBJECTS } from '../../graphql/queries';
+import { GET_SUBJECTS, GET_ALL_COURSES } from '../../graphql/queries';
 import * as SecureStore from 'expo-secure-store';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -13,9 +13,11 @@ function Subjects() {
     id: string;
     name: string;
     numberOfClasses: number;
+    courseId: string;
   }
 
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
+  const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [numberOfClasses, setNumberOfClasses] = useState('');
   const [token, setToken] = useState<string | null>(null);
@@ -25,9 +27,15 @@ function Subjects() {
   const [isEditingName, setIsEditingName] = useState(false);
   const [isEditingNumberOfClasses, setIsEditingNumberOfClasses] = useState(false);
 
+  const [isModalVisible, setIsModalVisible] = useState(false);
+
   const { data, loading, error, refetch } = useQuery(GET_SUBJECTS, { client: clientUser });
   const [createSubject] = useMutation(CREAR_ASIGNATURA, { client: clientUser });
   const [updateSubject] = useMutation(ACTUALIZAR_ASIGNATURA, { client: clientUser });
+
+  const { data: coursesData, loading: coursesLoading, error: coursesError } = useQuery(GET_ALL_COURSES, {
+    client: clientUser,
+  });
 
   useEffect(() => {
     const getToken = async () => {
@@ -51,7 +59,7 @@ function Subjects() {
       return;
     }
 
-    if (!name || numberOfClasses === '') {
+    if (!name || numberOfClasses === '' || !selectedCourse) {
       Alert.alert('Error', 'Todos los campos son obligatorios');
       return;
     }
@@ -65,7 +73,11 @@ function Subjects() {
     try {
       const response = await createSubject({
         variables: {
-          createSubjectInput: { name, numberOfClasses: numClasses },
+          createSubjectInput: {
+            name,
+            numberOfClasses: numClasses,
+            courseId: parseInt(selectedCourse, 10),
+          },
         },
       });
 
@@ -75,6 +87,7 @@ function Subjects() {
         setSelectedSubject(null);
         setName('');
         setNumberOfClasses('');
+        setSelectedCourse(null);
       } else {
         Alert.alert('Error', 'No se pudo crear la asignatura');
       }
@@ -103,6 +116,7 @@ function Subjects() {
             name: selectedSubject.name,
             newName: tempName,
             numberOfClasses: numClasses,
+            courseId: selectedSubject.courseId ? parseInt(selectedSubject.courseId, 10) : null,
           },
         },
       });
@@ -160,10 +174,12 @@ function Subjects() {
             <TouchableOpacity onPress={() => setSelectedSubject({
               id: '',
               name: '',
-              numberOfClasses: 0
+              numberOfClasses: 0,
+              courseId: ''
             })} style={styles.button}>
               <Text style={styles.buttonText}>Crear nueva asignatura</Text>
             </TouchableOpacity>
+
           </>
         ) : (
           <>
@@ -172,6 +188,46 @@ function Subjects() {
                 <Text style={styles.subtitle}>Creación de Asignatura</Text>
                 {renderEditableInfo('book', 'Nombre', name, isEditingName, setIsEditingName, setName)}
                 {renderEditableInfo('table', 'Cantidad de Clases', numberOfClasses, isEditingNumberOfClasses, setIsEditingNumberOfClasses, setNumberOfClasses)}
+                <Text style={styles.infoContainer}>
+                  Curso: {selectedCourse ? coursesData?.getAllCourse.find((course: { id: string; }) => course.id === selectedCourse)?.nameCourse : 'No seleccionado'}
+                </Text>
+                
+                <TouchableOpacity onPress={() => setIsModalVisible(true)} style={styles.button}>
+                  <Text style={styles.buttonText}>Seleccionar Curso</Text>
+                </TouchableOpacity>
+                <Modal
+                  animationType="slide"
+                  transparent={true}
+                  visible={isModalVisible}
+                  onRequestClose={() => setIsModalVisible(false)}
+                >
+                  <View style={styles.modalBackground}>
+                    <View style={styles.modalContainer}>
+                      <Text style={styles.modalTitle}>Selecciona un Curso</Text>
+                      <ScrollView>
+                        {coursesData?.getAllCourse?.map((course: { id: string, nameCourse: string }) => (
+                          <TouchableOpacity
+                            key={course.id}
+                            style={styles.modalItem}
+                            onPress={() => {
+                              setSelectedCourse(course.id);
+                              setIsModalVisible(false);
+                            }}
+                          >
+                            <Text style={styles.modalItemText}>{course.nameCourse}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                      <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => setIsModalVisible(false)}
+                      >
+                        <Text style={styles.buttonText}>Cerrar</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </Modal>
+
                 <TouchableOpacity onPress={handleCreate} style={styles.button}>
                   <Text style={styles.buttonText}>Guardar Asignatura</Text>
                 </TouchableOpacity>
@@ -184,6 +240,50 @@ function Subjects() {
                 <Text style={styles.subtitle}>Editar Asignatura</Text>
                 {renderEditableInfo('book', 'Nombre', tempName, isEditingName, setIsEditingName, setTempName)}
                 {renderEditableInfo('table', 'Cantidad de Clases', tempNumberOfClasses, isEditingNumberOfClasses, setIsEditingNumberOfClasses, setTempNumberOfClasses)}
+                <Text style={styles.infoContainer}>
+                  Curso: {selectedSubject.courseId ? 
+                    coursesData?.getAllCourse.find((course: { id: string; }) => course.id === selectedSubject.courseId)?.nameCourse 
+                    : 'No seleccionado'}
+                </Text>
+
+                <TouchableOpacity onPress={() => setIsModalVisible(true)} style={styles.button}>
+                  <Text style={styles.buttonText}>Cambiar Curso</Text>
+                </TouchableOpacity>
+
+                <Modal
+                  animationType="slide"
+                  transparent={true}
+                  visible={isModalVisible}
+                  onRequestClose={() => setIsModalVisible(false)}
+                >
+                  <View style={styles.modalBackground}>
+                    <View style={styles.modalContainer}>
+                      <Text style={styles.modalTitle}>Selecciona un Curso</Text>
+                      <ScrollView>
+                        {coursesData?.getAllCourse?.map((course: { id: string, nameCourse: string }) => (
+                          <TouchableOpacity
+                            key={course.id}
+                            style={styles.modalItem}
+                            onPress={() => {
+                              // Update the selectedSubject's courseId
+                              setSelectedSubject(prev => prev ? {...prev, courseId: course.id} : null);
+                              setIsModalVisible(false);
+                            }}
+                          >
+                            <Text style={styles.modalItemText}>{course.nameCourse}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </ScrollView>
+                      <TouchableOpacity
+                        style={styles.button}
+                        onPress={() => setIsModalVisible(false)}
+                      >
+                        <Text style={styles.buttonText}>Cerrar</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </Modal>
+                
                 <TouchableOpacity onPress={handleUpdate} style={styles.button}>
                   <Text style={styles.buttonText}>Guardar cambios</Text>
                 </TouchableOpacity>

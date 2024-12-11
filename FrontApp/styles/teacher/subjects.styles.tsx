@@ -68,6 +68,33 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     alignSelf: 'flex-start',
   },
+  modalBackground: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    padding: 20,
+    borderRadius: 10,
+    width: '80%',
+  },
+  modalItem: {
+    padding: 10,
+    backgroundColor: '#6a874d',
+    marginVertical: 5,
+    borderRadius: 8,
+  },
+  modalItemText: {
+    color: '#fff',
+    fontSize: 16,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
   scrollContainer: {
     flexGrow: 1,
     justifyContent: 'center',

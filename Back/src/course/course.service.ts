@@ -27,7 +27,7 @@ export class CourseService{
     async deleteCourse (deleteCourse: DeleteCourseDto): Promise<boolean>{
         const existCourse = await this.courseRepository.findOne({where: {nameCourse: deleteCourse.nameCourse, level: deleteCourse.level}});
         if(!existCourse){
-            throw new BadRequestException('El curso no existe!')
+            throw new NotFoundException('El curso no existe!')
         }
         await this.courseRepository.delete(existCourse);
         return true;
@@ -58,5 +58,9 @@ export class CourseService{
 
         await this.courseRepository.update({ id: existCourse.id }, updateData);
         return true;
+    }
+
+    async getAllCourses(): Promise<CourseEntity[]> {
+        return this.courseRepository.find({ relations: ['subjects'] }); 
     }
 }

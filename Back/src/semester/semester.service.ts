@@ -64,6 +64,10 @@ export class SemesterService{
         await this.semesterRepository.update({ id: existSemester.id }, updateData);
 
         return true;
+    };
+
+    async getAllSemester(): Promise<SemesterEntity[]>{
+        return this.semesterRepository.find();
     }
 
 }

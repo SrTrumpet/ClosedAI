@@ -120,7 +120,7 @@ export const GET_ALL_SEMESTERS = gql`
       nameSemester
       startDate
       endDate
-     deadline
+      deadline
 	  }
   }
 `;

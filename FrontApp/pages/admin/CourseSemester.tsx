@@ -152,23 +152,40 @@ function CourseSemesterManagement() {
   };
 
   const handleUpdate = async () => {
+      
     try {
       if (isManagingCourses) {
         await updateCourse({
-          variables: { updateCourseDto: { nameCourse: selectedItem?.name, newName: name, level: level, newLevel: level } }
-        });
+            variables: {
+              updateCourseDto: {
+                nameCourse: selectedItem?.name,
+                newName: name,
+                level: selectedItem?.extraField?.level, // Nivel actual
+                newLevel: level, // Nuevo nivel
+              },
+            },
+          });          
         refetchCourses();
       } else {
+        if (!extraField.startDate || !extraField.endDate || !extraField.deadline) {
+            Alert.alert('Error', 'Todos los campos de fecha son obligatorios');
+            return;
+        }
+
+        if (!validateDates()) {
+            return; 
+        }
+
         await updateSemester({
-          variables: {
-            updateSemesterDto: {
-              nameSemester: selectedItem?.name || '',
-              newNameSemester: name,
-              startDate: extraField.startDate,
-              endDate: extraField.endDate,
-              deadline: extraField.deadline,
-            }
-          }
+            variables: {
+                updateSemesterDto: {
+                  nameSemester: selectedItem?.name || '',
+                  newNameSemester: name,
+                  startDate: formatDate(extraField.startDate), // Asegúrate de formatear correctamente
+                  endDate: formatDate(extraField.endDate),
+                  deadline: formatDate(extraField.deadline),
+                },
+              },
         });
         refetchSemesters();
       }
@@ -207,11 +224,24 @@ function CourseSemesterManagement() {
   const handleDelete = async () => {
     try {
       if (isManagingCourses) {
-        await deleteCourse({ variables: { nameCourse: selectedItem?.name, newName: name } });
+        await deleteCourse({
+            variables: {
+              deleteCourseDto: {
+                nameCourse: selectedItem?.name || '',
+                level: selectedItem?.extraField?.level,
+              },
+            },
+          });          
         refetchCourses();
       } else {
         if (selectedItem) {
-          await deleteSemester({ variables: { nameSemester: selectedItem.nameSemester } });
+            await deleteSemester({
+                variables: {
+                  deleteSemesterDto: {
+                    nameSemester: selectedItem?.name || '',
+                  },
+                },
+              });
         }
         refetchSemesters();
       }
@@ -242,26 +272,47 @@ function CourseSemesterManagement() {
 
 
         <Modal visible={showListModal} animationType="slide" transparent={true}>
-          <View style={styles.modalContainer}>
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Lista de {isManagingCourses ? "Cursos" : "Semestres"}</Text>
-              <ScrollView>
-                {(isManagingCourses ? courseData?.listCourses : semesterData?.listSemesters)?.map((item: { id: string; name: string; extraField?: any }, index: number) => (
-                  <TouchableOpacity
-                    key={item.id}
-                    onPress={() => openEditModal(item)}
-                    style={styles.subjectItem}
-                  >
-                    <Text style={styles.subjectItemText}>{index + 1}. {item.name}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-              <TouchableOpacity onPress={() => setShowListModal(false)} style={styles.closeButton}>
-                <Text style={styles.buttonText}>Cerrar</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
+  <View style={styles.modalContainer}>
+    <View style={styles.modalContent}>
+      <Text style={styles.modalTitle}>Lista de {isManagingCourses ? "Cursos" : "Semestres"}</Text>
+      <ScrollView>
+        {(isManagingCourses ? courseData?.getAllCourse : semesterData?.getAllSemester)?.map(
+          (item: any, index: number) => (
+            <TouchableOpacity
+              key={item.id}
+              onPress={() => openEditModal({
+                id: item.id,
+                name: isManagingCourses ? item.nameCourse : item.nameSemester,
+                extraField: isManagingCourses
+                  ? { level: item.level, subjects: item.subjects }
+                  : { startDate: item.startDate, endDate: item.endDate, deadline: item.deadline }
+              })}
+              style={styles.subjectItem}
+            >
+              <Text style={styles.subjectItemText}>
+                {index + 1}. {isManagingCourses ? item.nameCourse : item.nameSemester}
+              </Text>
+              {isManagingCourses && (
+                <Text style={styles.subjectItemText}>Nivel: {item.level}</Text>
+              )}
+              {!isManagingCourses && (
+                <>
+                  <Text style={styles.subjectItemText}>Inicio: {item.startDate}</Text>
+                  <Text style={styles.subjectItemText}>Fin: {item.endDate}</Text>
+                  <Text style={styles.subjectItemText}>Deadline: {item.deadline}</Text>
+                </>
+              )}
+            </TouchableOpacity>
+          )
+        )}
+      </ScrollView>
+      <TouchableOpacity onPress={() => setShowListModal(false)} style={styles.closeButton}>
+        <Text style={styles.buttonText}>Cerrar</Text>
+      </TouchableOpacity>
+    </View>
+  </View>
+</Modal>
+
 
         <TextInput
           style={styles.input}
@@ -312,7 +363,7 @@ function CourseSemesterManagement() {
             <TouchableOpacity onPress={handleUpdate} style={styles.button}>
               <Text style={styles.buttonText}>Actualizar</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleDelete} style={styles.button}>
+            <TouchableOpacity onPress={handleDelete} style={styles.closeButton}>
               <Text style={styles.buttonText}>Eliminar</Text>
             </TouchableOpacity>
           </>

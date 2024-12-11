@@ -1,8 +1,10 @@
-import { Resolver, Args, Mutation} from '@nestjs/graphql';
+import { Resolver, Args, Mutation, Query} from '@nestjs/graphql';
 import { CreateSemesterDto } from './dto/semester.dto';
 import { UpdateSemesterDto } from './dto/updateSemester.dto';
 import { DeleteSemesterDto } from './dto/deleteSemester.dto';
 import { SemesterService } from './semester.service';
+import { SemesterEntity } from './entity/semester.entity';
+
 
 
 @Resolver()
@@ -22,5 +24,10 @@ export class SemesterResolver{
     @Mutation(() => Boolean)
     async updateSemester(@Args('updateSemesterDto') updateSemesterDto: UpdateSemesterDto): Promise<boolean> {
         return this.semesterService.updateSemester(updateSemesterDto);
+    }
+
+    @Query(() => [SemesterEntity])
+    async getAllSemester(): Promise<SemesterEntity[]>{
+        return this.semesterService.getAllSemester();
     }
 }

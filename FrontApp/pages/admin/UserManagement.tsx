@@ -128,8 +128,8 @@ function UserManagement() {
       return;
     }
 
-    const validRoles = ['teacher', 'student', 'parent'];
-    if (!validRoles.includes(tempUserRole.toLowerCase())) {
+    const validRoles = ['Teacher', 'Student', 'Parents'];
+    if (!validRoles.includes(tempUserRole)) {
         Alert.alert('Error', 'El rol ingresado no es válido. Debe ser "teacher", "student" o "parent".');
         return;
     }
@@ -148,7 +148,7 @@ function UserManagement() {
             lastName: tempUserLastName,
             rut: tempUserRut,
             email: tempUserEmail,
-            role: tempUserRole.toLowerCase(),
+            role: tempUserRole,
             password: 'defaultPassword'
           },
           
@@ -242,7 +242,7 @@ function UserManagement() {
               {renderEditableInfo('user', 'Apellido', tempUserLastName, isEditingLastName, setIsEditingLastName, setTempUserLastName)}
               {selectedUser.id ? renderInfo('id-card', 'RUT', tempUserRut) : renderEditableInfo('id-card', 'RUT', tempUserRut, isEditingRut, setIsEditingRut, formatoRUT)}
               {renderEditableInfo('envelope', 'E-mail', tempUserEmail, isEditingEmail, setIsEditingEmail, setTempUserEmail)}
-              {renderEditableInfo('star', 'Rol', tempUserRole, isEditingRole, setIsEditingRole, setTempUserRole)}
+              {selectedUser.id ? renderInfo('star', 'Rol', translateRole(tempUserRole)) : renderEditableInfo('star', 'Rol', tempUserRole, isEditingRole, setIsEditingRole, setTempUserRole)}
 
               {(isEditingName || isEditingLastName || isEditingEmail) && userRole !== 'teacher' && (
                 <TouchableOpacity onPress={selectedUser.id ? handleSaveChanges : handleCreateUser} style={styles.button} disabled={loading}>
@@ -257,7 +257,7 @@ function UserManagement() {
           {selectedUser && selectedUser.id && (
             <TouchableOpacity
               onPress={() => {
-                if (tempUserRole === 'admin') {
+                if (tempUserRole === 'Admin') {
                   Alert.alert('Error', 'No se puede eliminar un usuario con rol de administrador');
                   return;
                 }
