@@ -10,6 +10,7 @@ import { SemesterModule } from './semester/semester.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
+import { FormsModule } from './form/forms.module';
 import { GradesModule } from './grades/grades.module';
 import { PubSub } from 'graphql-subscriptions';
 
@@ -21,7 +22,7 @@ import { PubSub } from 'graphql-subscriptions';
     AsistModule,
     SubjectModule,
     GradesModule,
-    
+    FormsModule,    
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',

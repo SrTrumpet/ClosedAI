@@ -3,6 +3,15 @@ import { IsNotEmpty, IsString, IsArray, ArrayNotEmpty } from 'class-validator';
 
 @InputType()
 export class CreateFormDto {
+
+  @Field({ description: 'ID of the user who submitted the form' })
+  @IsNotEmpty()
+  creatorId: number;
+
+  @Field({ description: 'ID of the course' })
+  @IsNotEmpty()
+  courseId: number;
+
   @Field({ description: 'Title of the form' })
   @IsNotEmpty({ message: 'The title field is required' })
   @IsString({ message: 'The title must be a string' })
