@@ -30,6 +30,7 @@ export class UserEntity {
     enum: UserRoles,
     default: UserRoles.Student,
   })
+    
   @Field(() => UserRoles)
   role: UserRoles;
 

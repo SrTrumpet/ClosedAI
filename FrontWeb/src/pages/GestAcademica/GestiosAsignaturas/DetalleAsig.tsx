@@ -33,6 +33,7 @@ const DetalleAsig: React.FC = () => {
   const [findByRut, { data: findByRutData, loading: loadingFind }] = useLazyQuery(FIND_BY_RUT);
 
   const [takeAsit] = useMutation(TAKE_ASIT);
+  const [editMode] = useState(false); // Estado para habilitar/deshabilitar edición
 
   useEffect(() => {
     if (data && data.listUsersBySubject.length > 0) {
@@ -77,24 +78,20 @@ const DetalleAsig: React.FC = () => {
     }
   };
 
-  
-
   useEffect(() => {
-    console.log("Datos retornados por findByRutData:", findByRutData);
     if (findByRutData?.findByRut) {
-        const foundStudent = findByRutData.findByRut;
+      const foundStudent = findByRutData.findByRut;
 
-        // Solo muestra usuarios con rol "Student"
-        if (foundStudent.role === "Student") {
-            setSuggestions([foundStudent]);
-        } else {
-            setSuggestions([]);
-        }
-    } else {
+      // Solo muestra usuarios con rol "Student"
+      if (foundStudent.role === "Student") {
+        setSuggestions([foundStudent]);
+      } else {
         setSuggestions([]);
+      }
+    } else {
+      setSuggestions([]);
     }
   }, [findByRutData]);
-
 
   const handleAddStudent = (student: Student) => {
     const isAlreadyInList = students.some((s) => s.id === student.id);
@@ -110,15 +107,14 @@ const DetalleAsig: React.FC = () => {
     const attendanceSummary = students.map((student) => ({
       idUser: Number(student.id),
       idSubject: Number(subjectId),
-      asist: student.isPresent ? 1 : 0,
-      absences: student.isPresent ? 0 : 1,
+      asist: student.isPresent ? 1 : 0, // 0 o 1 según el estado del estudiante
     }));
 
     try {
       await takeAsit({
         variables: {
           createAsistInput: {
-            asistencias: attendanceSummary,
+            asistencias: attendanceSummary, // Solo se envían los datos requeridos
           },
         },
       });
@@ -147,13 +143,15 @@ const DetalleAsig: React.FC = () => {
         <div className="bg-white p-6 rounded-lg shadow-lg">
           <h3 className="text-xl font-bold mb-4">Lista de Asistencia</h3>
           <div className="flex flex-col mb-6">
-            <input
-              type="text"
-              placeholder="Buscar por RUT"
-              value={searchRut}
-              onChange={handleSearchRutChange}
-              className="border border-gray-300 rounded-lg px-4 py-2"
-            />
+            {!editMode && ( // Eliminar input de RUT si estamos en modo edición
+              <input
+                type="text"
+                placeholder="Buscar por RUT"
+                value={searchRut}
+                onChange={handleSearchRutChange}
+                className="border border-gray-300 rounded-lg px-4 py-2"
+              />
+            )}
             {loadingFind ? (
               <p className="text-gray-500 mt-2">Buscando...</p>
             ) : (
@@ -173,7 +171,6 @@ const DetalleAsig: React.FC = () => {
                 searchRut.length > 7 && <p className="text-gray-500 mt-2">No se encontró el estudiante.</p>
               )
             )}
-
           </div>
           <div className="grid gap-4">
             {students.length > 0 ? (

@@ -17,7 +17,7 @@ const CreateAsig: React.FC = () => {
   const [numberOfClasses, setNumberOfClasses] = useState<number | "">("");
   const navigate = useNavigate();
   const [createSubject] = useMutation(CREAR_ASIGNATURA, {
-    refetchQueries: [{ query: LISTAR_CURSOS }], // Refresca la lista de cursos tras crear uno nuevo
+    refetchQueries: [{ query: LISTAR_CURSOS }], 
   });
 
   
