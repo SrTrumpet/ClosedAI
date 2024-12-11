@@ -118,3 +118,4 @@ export const DELETE_GRADE = gql`
     deleteGrade(id: $id)
   }
 `;
+

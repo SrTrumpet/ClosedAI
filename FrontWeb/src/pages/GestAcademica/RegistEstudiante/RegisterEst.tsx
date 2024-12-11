@@ -22,10 +22,8 @@ const RegisterEst: React.FC = () => {
   const [role, setRole] = useState("Student");
   const [editStudentRut, setEditStudentRut] = useState<string | null>(null);
 
-  // Consulta para obtener todos los estudiantes
   const { loading, error, data } = useQuery(GET_ALL_STUDENTS);
 
-  // Mutaciones
   const [createUser] = useMutation(CREATE_USER, {
     update(cache, { data: { createUser } }) {
       cache.modify({
@@ -87,14 +85,11 @@ const RegisterEst: React.FC = () => {
     }
   });
   
-
-
   const handleAddOrUpdateStudent = async () => {
     if (!firstName || !lastName || !rut || !email) {
       alert("Por favor, complete todos los campos.");
       return;
     }
-  
     try {
       if (editStudentRut) {
         await updateUser({
@@ -133,37 +128,32 @@ const RegisterEst: React.FC = () => {
     }
   };
   
-  
-
-const handleDeleteStudent = async (rut: string) => {
-  const confirmDelete = window.confirm("¿Está seguro de que desea eliminar este estudiante?");
-  if (confirmDelete) {
-    try {
-      await deleteUser({
-        variables: { rut },
-        update(cache) {
-          const userRefToRemove = `UserEntity:${rut}`; // Crea la referencia de usuario a eliminar
-          
-          cache.modify({
-            fields: {
-              getAllStudents(existingStudents = []) {
-                return existingStudents.filter(
-                  (studentRef: Reference) => studentRef.__ref !== userRefToRemove
-                );
+  const handleDeleteStudent = async (rut: string) => {
+    const confirmDelete = window.confirm("¿Está seguro de que desea eliminar este estudiante?");
+    if (confirmDelete) {
+      try {
+        await deleteUser({
+          variables: { rut },
+          update(cache) {
+            const userRefToRemove = `UserEntity:${rut}`; 
+            
+            cache.modify({
+              fields: {
+                getAllStudents(existingStudents = []) {
+                  return existingStudents.filter(
+                    (studentRef: Reference) => studentRef.__ref !== userRefToRemove
+                  );
+                }
               }
-            }
-          });
-        }
-      });
-    } catch (error) {
-      console.error("Error al eliminar usuario:", error);
-      alert("Ocurrió un error al eliminar el usuario.");
+            });
+          }
+        });
+      } catch (error) {
+        console.error("Error al eliminar usuario:", error);
+        alert("Ocurrió un error al eliminar el usuario.");
+      }
     }
-  }
-};
-
-  
-  
+  };
 
   const handleEditStudent = (student: Student) => {
     setFirstName(student.firstName);
@@ -174,7 +164,6 @@ const handleDeleteStudent = async (rut: string) => {
     setEditStudentRut(student.rut);
   };
   
-
   if (loading) return <p>Cargando lista de estudiantes...</p>;
   if (error) return <p>Error al cargar estudiantes: {error.message}</p>;
 
@@ -213,10 +202,17 @@ const handleDeleteStudent = async (rut: string) => {
                   type="text"
                   value={rut}
                   onChange={(e) => setRut(e.target.value)}
-                  className="w-full border border-gray-300 p-2 rounded-lg"
+                  className={`w-full border p-2 rounded-lg ${
+                    editStudentRut
+                      ? "bg-gray-200 border-gray-400 cursor-not-allowed"
+                      : "border-gray-300"
+                  }`}
                   placeholder="RUT del estudiante"
+                  disabled={!!editStudentRut} 
                 />
               </div>
+
+
               <div className="mt-4">
                 <label className="block text-sm font-semibold">Email</label>
                 <input
