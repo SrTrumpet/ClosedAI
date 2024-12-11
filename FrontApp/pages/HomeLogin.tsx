@@ -245,6 +245,7 @@ function HomeLogin() {
             {renderButton('Agregar y desplegar asistencia', 'hand-stop-o', () => {navigation.navigate('Attendance' as never)})}
             {renderButton('Calificar estudiantes', 'check-square', () => {navigation.navigate('Grades' as never)})}
             {renderButton('Agregar eventos', 'calendar', () => {navigation.navigate('Events' as never)})}
+            {renderButton('Enviar comunicados o formularios', 'envelope', () => {navigation.navigate('Suggestions' as never)})}
           </View>
 
           <View style={[styles.floatingButtonContainer, { transform: [{ translateY: scrollY }] },]}>

@@ -124,3 +124,65 @@ export const GET_ALL_SEMESTERS = gql`
 	  }
   }
 `;
+
+export const GET_ALL_FORMS = gql`
+  query GetAllForms {
+    forms {
+      id
+      title
+      description
+      questions
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_FORM_BY_ID = gql`
+  query GetFormById($id: ID!) {
+    form(id: $id) {
+      id
+      title
+      description
+      questions
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const GET_ALL_RESPONSES = gql`
+  query GetAllResponses {
+    getAllResponses {
+      id
+      formId
+      userId
+      answers
+      submittedAt
+    }
+  }
+`;
+
+export const GET_RESPONSES_BY_FORM_ID = gql`
+  query GetResponsesByFormId($formId: Float!) {
+    getResponsesByFormId(formId: $formId) {
+      id
+      formId
+      userId
+      answers
+      submittedAt
+    }
+  }
+`;
+
+export const GET_RESPONSE_BY_ID = gql`
+  query GetResponseById($id: Float!) {
+    getResponseById(id: $id) {
+      id
+      formId
+      userId
+      answers
+      submittedAt
+    }
+  }
+`;

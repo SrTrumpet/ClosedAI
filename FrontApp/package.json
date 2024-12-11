@@ -38,7 +38,10 @@
     "react-native-web": "~0.19.13",
     "react-router-dom": "^6.27.0",
     "react-toastify": "^10.0.6",
-    "twrnc": "^4.5.1"
+    "twrnc": "^4.5.1",
+    "expo-document-picker": "~13.0.1",
+    "expo-sharing": "~13.0.0",
+    "expo-print": "~14.0.2"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

@@ -172,3 +172,22 @@ export const DELETE_SEMESTER = gql`
     deleteSemester(deleteSemesterDto: $deleteSemesterDto)
   }
 `;
+
+export const CREATE_FORM = gql`
+  mutation CreateForm($createFormInput: CreateFormDto!) {
+    createForm(createFormInput: $createFormInput) {
+      id
+      title
+      description
+      questions
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+export const DELETE_FORM = gql`
+  mutation RemoveForm($id: ID!) {
+    removeForm(id: $id)
+  }
+`;

@@ -78,12 +78,13 @@ function AcademicRecord() {
       setIsLoading(true);
       try {
         const gradesPromises = subjectsData.listSubject.map(async (subject: any) => {
+          
           try {
             const { data } = await clientUser.query({
               query: GET_GRADES_BY_STUDENT_AND_SUBJECT,
               variables: { studentId: parseFloat(selectedUser.id), subjectId: parseFloat(subject.id) }
             });
-
+            console.log('Fetching grades for data:', data);
             return {
               subject,
               grades: data.gradesByStudentAndSubject || []
