@@ -112,13 +112,23 @@ export class UserService {
     }
 
     async updateUser(rut: string, updateUserDto: UpdateUserDto): Promise<UserEntity> {
+
         const user = await this.userRepository.findOne({ where: { rut } });
+        console.log(user);
+
         if (!user) {
             throw new BadRequestException(`Usuario con rut ${rut} no encontrado`);
         }
         const emailCheck = await this.userRepository.findOne({where: {email: updateUserDto.email}});
-        if(emailCheck){
-            throw new BadRequestException("El email ingresado ya esta en uso!");
+        
+        if (updateUserDto.email) {
+            const emailCheck = await this.userRepository.findOne({ where: { email: updateUserDto.email } });
+            console.log(emailCheck);
+
+            if (emailCheck && emailCheck.id !== user.id) {
+                throw new BadRequestException("El email ingresado ya está en uso por otro usuario!");
+            }
+            user.email = updateUserDto.email;
         }
         if (updateUserDto.firstName) {
             user.firstName = updateUserDto.firstName;
