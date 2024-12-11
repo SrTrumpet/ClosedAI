@@ -29,10 +29,30 @@ type AuthResponse {
   isChangePassword: Boolean!
 }
 
+type CourseEntity {
+  id: ID!
+  nameCourse: String!
+  level: CourseLevels!
+
+  """Las asignaturas asociadas al curso"""
+  subjects: [SubjectEntity!]!
+}
+
+"""Son los niveles de enseñansa de los colegios"""
+enum CourseLevels {
+  Basica
+  Media
+  Kinder
+  PreKinder
+}
+
 """La entidad Subject que representa una asignatura"""
 type SubjectEntity {
   id: ID!
   name: String!
+
+  """El curso al que pertenece la asignatura"""
+  course: CourseEntity!
   numberOfClasses: Float!
   idTeacher: Float!
 }
@@ -74,47 +94,6 @@ type GradeEntity {
   subjectId: Float!
 }
 
-"""Entity representing a form with questions"""
-type Form {
-  """Unique identifier of the form"""
-  id: ID!
-
-  """Title of the form"""
-  title: String!
-
-  """Optional description of the form"""
-  description: String
-
-  """List of questions in the form"""
-  questions: [String!]!
-
-  """Date when the form was created"""
-  createdAt: DateTime!
-
-  """Date when the form was last updated"""
-  updatedAt: DateTime
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
-type Response {
-  """Unique identifier of the form"""
-  id: ID!
-
-  """ID del formulario"""
-  formId: Float!
-
-  """ID del usuario"""
-  userId: Float!
-
-  """List of answers in the form"""
-  answers: [String!]!
-  submittedAt: DateTime!
-}
-
 type Query {
   getAllNotices: [NoticeEntity!]!
 
@@ -127,9 +106,20 @@ type Query {
 
   """Obtiene los usuarios y su asistencia por asignatura"""
   listUsersBySubject(idSubject: Float!): [UserWithAttendanceDto!]!
+
+  """Listar todas las asignaturas."""
   listSubject: [SubjectEntity!]!
+
+  """
+  Obtener todas las asignaturas por ID de profesor, incluyendo el nombre del curso.
+  """
+  getAllSubjectByIdTeacher(
+    """ID del profesor."""
+    idTeacher: Int!
+  ): [SubjectEntity!]!
   gradesByStudentId(studentId: Float!): [GradeEntity!]!
   gradesBySubjectId(subjectId: Float!): [GradeEntity!]!
+  gradesByStudentIdAndSubjectId(studentId: Float!, subjectId: Float!): [GradeEntity!]!
   findGradeById(id: Float!): GradeEntity!
   getAllGrades: [GradeEntity!]!
 
@@ -163,29 +153,42 @@ type Mutation {
   """Marca la asistencia de los estudiantes"""
   takeAsist(createAsistInput: CreateAsistDto!): Boolean!
 
-  """Create a new subject by providing the name and number of classes."""
+  """
+  Crear una nueva asignatura proporcionando el nombre y número de clases.
+  """
   createSubject(
     """
-    The input data for creating a new subject, including name and number of classes.
+    Datos de entrada para crear una nueva asignatura, incluyendo nombre y número de clases.
     """
     createSubjectInput: CreateSubjectDto!
   ): SubjectResponse!
 
-  """Remove a subject by its name. Returns true if deletion is successful."""
+  """
+  Crear una nueva asignatura como administrador proporcionando el nombre, número de clases, ID del curso y ID del profesor.
+  """
+  addNewSubjectAdmin(
+    """
+    Datos de entrada para que un administrador cree una nueva asignatura, incluyendo nombre, número de clases, ID del curso y ID del profesor.
+    """
+    createSubjectAdminInput: CreateSubjectAdminDto!
+  ): SubjectResponse!
+
+  """
+  Eliminar una asignatura por su nombre. Retorna true si la eliminación es exitosa.
+  """
   removeSubject(
-    """The name of the subject to delete."""
+    """El nombre de la asignatura a eliminar."""
     name: String!
   ): Boolean!
-  updateSubject(createSubjectInput: UpdateSubjectDto!): Boolean!
+
+  """Actualizar una asignatura proporcionando los campos necesarios."""
+  updateSubject(
+    """Datos de entrada para actualizar una asignatura."""
+    updateSubjectInput: UpdateSubjectDto!
+  ): SubjectEntity!
   createGrade(createGradeDto: CreateGradeDto!): GradeEntity!
   updateGrade(id: Float!, updateGradeDto: UpdateGradeDto!): GradeEntity!
   deleteGrade(id: Float!): Boolean!
-
-  """Create a new form"""
-  createForm(createFormInput: CreateFormDto!): Form!
-
-  """Delete a form by ID"""
-  removeForm(id: ID!): Boolean!
 }
 
 input CreateUserDto {
@@ -211,18 +214,26 @@ input CreateAsistItemDto {
   idUser: Float!
   idSubject: Float!
   asist: Float!
-  absences: Float!
 }
 
 input CreateSubjectDto {
   name: String!
   numberOfClasses: Int
+  courseId: Int!
+}
+
+input CreateSubjectAdminDto {
+  name: String!
+  numberOfClasses: Int
+  courseId: Int!
+  idTeacher: Int!
 }
 
 input UpdateSubjectDto {
   name: String!
   newName: String
   numberOfClasses: Int
+  courseId: Int
 }
 
 input CreateGradeDto {
@@ -235,15 +246,4 @@ input UpdateGradeDto {
   grade: Float
   studentId: Float
   subjectId: Float
-}
-
-input CreateFormDto {
-  """Title of the form"""
-  title: String!
-
-  """Optional description of the form"""
-  description: String
-
-  """List of questions in the form"""
-  questions: [String!]!
 }
