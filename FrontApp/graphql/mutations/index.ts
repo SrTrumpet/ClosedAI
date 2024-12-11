@@ -62,6 +62,12 @@ export const ACTUALIZAR_USUARIO = gql`
     }
 `;
 
+export const ELIMINAR_USUARIO = gql`
+    mutation RemoveUser($rut: String!) {
+        removeUser(rut: $rut)
+    }
+`;
+
 export const CAMBIAR_CONTRASENA = gql`
   mutation ChangePassword($newPassword: String!) {
     changePassword(newPassword: $newPassword) {
@@ -128,5 +134,41 @@ export const UPDATE_GRADE = gql`
 export const DELETE_GRADE = gql`
   mutation DeleteGrade($id: Float!) {
     deleteGrade(id: $id)
+  }
+`;
+
+export const CREATE_COURSE = gql`
+  mutation CreateCourse($createCourseDto: CreateCourseDto!) {
+    createCourse(createCourseDto: $createCourseDto)
+  }
+`;
+
+export const UPDATE_COURSE = gql`
+  mutation UpdateCourse($updateCourseDto: UpdateCourseDto!) {
+    updateCourseDto(updateCourseDto: $updateCourseDto)
+  }
+`;
+
+export const DELETE_COURSE = gql`
+  mutation DeleteCourse($deleteCourseDto: DeleteCourseDto!) {
+    deleteCourseDto(deleteCourseDto: $deleteCourseDto)
+  }
+`;
+
+export const CREATE_SEMESTER = gql`
+  mutation CreateSemester($createSemesterDto: CreateSemesterDto!) {
+    createSemester(createSemesterDto: $createSemesterDto)
+  }
+`;
+
+export const UPDATE_SEMESTER = gql`
+  mutation UpdateSemester($updateSemesterDto: UpdateSemesterDto!) {
+   updateSemester(updateSemesterDto: $updateSemesterDto)
+  }
+`;
+
+export const DELETE_SEMESTER = gql`
+  mutation DeleteSemester($deleteSemesterDto: DeleteSemesterDto!) {
+    deleteSemester(deleteSemesterDto: $deleteSemesterDto)
   }
 `;

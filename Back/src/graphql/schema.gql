@@ -25,9 +25,6 @@ type AuthResponse {
   verificacion: Boolean!
   role: String!
   firstName: String!
-  lastName: String!
-  rut: String!
-  email: String!
   id: Float!
   isChangePassword: Boolean!
 }
@@ -128,7 +125,7 @@ type Mutation {
     """The name of the subject to delete."""
     name: String!
   ): Boolean!
-  updateSubject(updateSubjectInput: UpdateSubjectDto!): SubjectEntity!
+  updateSubject(createSubjectInput: UpdateSubjectDto!): Boolean!
   createGrade(createGradeDto: CreateGradeDto!): GradeEntity!
   updateGrade(id: Float!, updateGradeDto: UpdateGradeDto!): GradeEntity!
   deleteGrade(id: Float!): Boolean!

@@ -224,8 +224,9 @@ function HomeLogin() {
           </Text>
           <View style={styles.buttonContainer}>
             {renderButton('Ver datos personales', 'user', () => navigation.navigate('DatosUsuario' as never))}
-            {renderButton('Ver y modificar datos de estudiantes', 'child', () => {navigation.navigate('DatosHijos' as never)})}
+            {renderButton('Ver y modificar datos de usuario', 'child', () => {navigation.navigate('UserManagement' as never)})}
             {renderButton('Crear y modificar asignaturas', 'book', () => {navigation.navigate('Subjects' as never)})}
+            {renderButton('Crear y modificar cursos y semestres', 'calendar-check-o', () => {navigation.navigate('CourseSemester' as never)})}
             {renderButton('Calificar estudiantes', 'check-square-o', () => {navigation.navigate('Grades' as never)})}
             {renderButton('Gestionar eventos', 'calendar', () => {navigation.navigate('Events' as never)})}
           </View>

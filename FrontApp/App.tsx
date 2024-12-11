@@ -15,6 +15,8 @@ import Subjects from './pages/teacher/Subjects';
 import Attendance from './pages/teacher/Attendance';
 import Grades from './pages/teacher/Grades';
 import Events from './pages/teacher/Events';
+import CourseSemester from './pages/admin/CourseSemester';
+import UserManagement from './pages/admin/UserManagement';
 
 const Stack = createStackNavigator();
 
@@ -36,6 +38,8 @@ export default function App() {
         <Stack.Screen name="Attendance" component={Attendance} options={{title: 'Gestión de asistencia', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
         <Stack.Screen name="Grades" component={Grades} options={{title: 'Calificaciones de estudiantes', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
         <Stack.Screen name="Events" component={Events} options={{title: 'Calendario de Eventos', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
+        <Stack.Screen name="CourseSemester" component={CourseSemester} options={{title: 'Gestión de Cursos y Semestres', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
+        <Stack.Screen name="UserManagement" component={UserManagement} options={{title: 'Gestión de Usuarios', headerStyle: {backgroundColor: '#6a874d',}, headerTintColor: '#fff', headerTitleStyle: {fontWeight: 'bold',}, }}/>
       </Stack.Navigator>
       </NavigationContainer>
     </ApolloClientsContext.Provider>

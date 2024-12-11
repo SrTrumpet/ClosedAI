@@ -5,10 +5,12 @@ import { AuthModule } from './auth/auth.module';
 import { SubjectModule } from './subject/subject.module';
 import { AsistModule } from './asist/asist.module';
 import { AdvicesModule } from './advices/advices.module';
+import { GradesModule } from './grades/grades.module';
+import { CourseModule } from './course/course.module';
+import { SemesterModule } from './semester/semester.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig} from '@nestjs/apollo';
 import { join } from 'path';
-import { GradesModule } from './grades/grades.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { GradesModule } from './grades/grades.module';
     AsistModule,
     SubjectModule,
     GradesModule,
+    CourseModule,
+    SemesterModule,
     
     TypeOrmModule.forRoot({
       type: 'mysql',

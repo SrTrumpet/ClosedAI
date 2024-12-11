@@ -8,8 +8,8 @@ export const GET_USERS = gql`
       lastName
       rut
       email
-      
-    }
+      role
+   }
   }
 `;
 
@@ -96,5 +96,31 @@ export const GET_GRADES_BY_STUDENT_AND_SUBJECT = gql`
       studentId
       subjectId
     }
+  }
+`;
+
+export const GET_ALL_COURSES = gql`
+  query GetAllCourse {
+    getAllCourse{
+      id
+      nameCourse
+	    level
+	    subjects{
+        name
+        numberOfClasses
+      }
+	  }
+  }
+`;
+
+export const GET_ALL_SEMESTERS = gql`
+  query GetAllSemester {
+    getAllSemester{
+      id
+      nameSemester
+      startDate
+      endDate
+     deadline
+	  }
   }
 `;
