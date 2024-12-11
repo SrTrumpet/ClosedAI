@@ -184,6 +184,9 @@ type Mutation {
 
   """Delete a form by ID"""
   removeForm(id: ID!): Boolean!
+
+  """Create a new response for a form"""
+  createResponse(responseDto: ResponseDto!): Response!
 }
 
 input CreateUserDto {
@@ -243,4 +246,15 @@ input CreateFormDto {
 
   """List of questions in the form"""
   questions: [String!]!
+}
+
+input ResponseDto {
+  """ID of the user who submitted the response"""
+  userId: Float!
+
+  """ID of the form being answered"""
+  formId: Float!
+
+  """List of answers in the form"""
+  answers: [String!]!
 }
