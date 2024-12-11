@@ -30,6 +30,10 @@ export class GradesService {
     return await this.gradeRepository.find({ where: { subjectId } });
   }
 
+    async findGradesByStudentIdAndSubjectId(studentId: number, subjectId: number): Promise<GradeEntity[]> {
+    return await this.gradeRepository.find({ where: { studentId, subjectId } });
+    }
+
   // Método para actualizar una nota
   async updateGrade(id: number, updateGradeDto: UpdateGradeDto): Promise<GradeEntity> {
     const grade = await this.gradeRepository.findOne({ where: { id } });
@@ -59,6 +63,5 @@ export class GradesService {
   async getAllGrades(): Promise<GradeEntity[]> {
     return await this.gradeRepository.find(); // Devuelve todas las calificaciones
   }
-  
 
 }

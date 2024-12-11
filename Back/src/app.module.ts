@@ -11,6 +11,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { GradesModule } from './grades/grades.module';
+import { PubSub } from 'graphql-subscriptions';
 
 @Module({
   imports: [
