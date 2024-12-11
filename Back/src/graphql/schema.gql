@@ -49,10 +49,30 @@ enum CourseLevels {
   PreKinder
 }
 
+type CourseEntity {
+  id: ID!
+  nameCourse: String!
+  level: CourseLevels!
+
+  """Las asignaturas asociadas al curso"""
+  subjects: [SubjectEntity!]!
+}
+
+"""Son los niveles de enseñansa de los colegios"""
+enum CourseLevels {
+  Basica
+  Media
+  Kinder
+  PreKinder
+}
+
 """La entidad Subject que representa una asignatura"""
 type SubjectEntity {
   id: ID!
   name: String!
+
+  """El curso al que pertenece la asignatura"""
+  course: CourseEntity!
 
   """El curso al que pertenece la asignatura"""
   course: CourseEntity!
@@ -160,7 +180,17 @@ type Query {
   listUsersBySubject(idSubject: Float!): [UserWithAttendanceDto!]!
 
   """Listar todas las asignaturas."""
+
+  """Listar todas las asignaturas."""
   listSubject: [SubjectEntity!]!
+
+  """
+  Obtener todas las asignaturas por ID de profesor, incluyendo el nombre del curso.
+  """
+  getAllSubjectByIdTeacher(
+    """ID del profesor."""
+    idTeacher: Int!
+  ): [SubjectEntity!]!
 
   """
   Obtener todas las asignaturas por ID de profesor, incluyendo el nombre del curso.
@@ -171,6 +201,7 @@ type Query {
   ): [SubjectEntity!]!
   gradesByStudentId(studentId: Float!): [GradeEntity!]!
   gradesBySubjectId(subjectId: Float!): [GradeEntity!]!
+  gradesByStudentIdAndSubjectId(studentId: Float!, subjectId: Float!): [GradeEntity!]!
   findGradeById(id: Float!): GradeEntity!
   getAllGrades: [GradeEntity!]!
   getAllCourse: [CourseEntity!]!
@@ -207,8 +238,12 @@ type Mutation {
   """
   Crear una nueva asignatura proporcionando el nombre y número de clases.
   """
+  """
+  Crear una nueva asignatura proporcionando el nombre y número de clases.
+  """
   createSubject(
     """
+    Datos de entrada para crear una nueva asignatura, incluyendo nombre y número de clases.
     Datos de entrada para crear una nueva asignatura, incluyendo nombre y número de clases.
     """
     createSubjectInput: CreateSubjectDto!
@@ -227,10 +262,30 @@ type Mutation {
   """
   Eliminar una asignatura por su nombre. Retorna true si la eliminación es exitosa.
   """
+  """
+  Crear una nueva asignatura como administrador proporcionando el nombre, número de clases, ID del curso y ID del profesor.
+  """
+  addNewSubjectAdmin(
+    """
+    Datos de entrada para que un administrador cree una nueva asignatura, incluyendo nombre, número de clases, ID del curso y ID del profesor.
+    """
+    createSubjectAdminInput: CreateSubjectAdminDto!
+  ): SubjectResponse!
+
+  """
+  Eliminar una asignatura por su nombre. Retorna true si la eliminación es exitosa.
+  """
   removeSubject(
+    """El nombre de la asignatura a eliminar."""
     """El nombre de la asignatura a eliminar."""
     name: String!
   ): Boolean!
+
+  """Actualizar una asignatura proporcionando los campos necesarios."""
+  updateSubject(
+    """Datos de entrada para actualizar una asignatura."""
+    updateSubjectInput: UpdateSubjectDto!
+  ): SubjectEntity!
 
   """Actualizar una asignatura proporcionando los campos necesarios."""
   updateSubject(
@@ -290,12 +345,21 @@ input CreateSubjectAdminDto {
   numberOfClasses: Int
   courseId: Int!
   idTeacher: Int!
+  courseId: Int!
+}
+
+input CreateSubjectAdminDto {
+  name: String!
+  numberOfClasses: Int
+  courseId: Int!
+  idTeacher: Int!
 }
 
 input UpdateSubjectDto {
   name: String!
   newName: String
   numberOfClasses: Int
+  courseId: Int
   courseId: Int
 }
 
