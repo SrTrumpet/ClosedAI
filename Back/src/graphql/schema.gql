@@ -123,6 +123,45 @@ type GradeEntity {
   subjectId: Float!
 }
 
+"""Entity representing a form with questions"""
+type Event {
+  """Unique identifier of the event"""
+  id: ID!
+
+  """ID del creador"""
+  creatorId: Float!
+
+  """ID del curso"""
+  courseId: Float!
+
+  """Title of the form"""
+  title: String!
+
+  """Optional description of the form"""
+  description: String
+
+  """Date when the form was created"""
+  createdAt: DateTime!
+
+  """Date when the form has to be completed"""
+  dueDate: DateTime!
+}
+
+type Response {
+  """Unique identifier of the form"""
+  id: ID!
+
+  """ID del formulario"""
+  formId: Float!
+
+  """ID del usuario"""
+  userId: Float!
+
+  """List of answers in the form"""
+  answers: [String!]!
+  submittedAt: DateTime!
+}
+
 type Query {
   getAllNotices: [NoticeEntity!]!
 
@@ -158,6 +197,15 @@ type Query {
   """Fetch a form by ID"""
   form(id: ID!): Form
   getId(id: Float!): Float!
+  getAllResponses: [Response!]!
+  getResponsesByFormId(formId: Float!): [Response!]!
+  getResponseById(id: Float!): Response!
+
+  """Fetch all events"""
+  events: [Event!]!
+
+  """Fetch an event by ID"""
+  event(id: ID!): Event
 }
 
 type Mutation {
@@ -219,6 +267,15 @@ type Mutation {
 
   """Delete a form by ID"""
   removeForm(id: ID!): Boolean!
+
+  """Create a new response for a form"""
+  createResponse(responseDto: ResponseDto!): Response!
+
+  """Create a new event"""
+  createEvent(createEventDto: CreateEventDto!): Event!
+
+  """Delete an event by ID"""
+  removeEvent(id: ID!): Boolean!
 }
 
 input CreateUserDto {
@@ -293,4 +350,32 @@ input CreateFormDto {
 
   """List of questions in the form"""
   questions: [String!]!
+}
+
+input ResponseDto {
+  """ID of the user who submitted the response"""
+  userId: Float!
+
+  """ID of the form being answered"""
+  formId: Float!
+
+  """List of answers in the form"""
+  answers: [String!]!
+}
+
+input CreateEventDto {
+  """ID of the user who submitted the form"""
+  creatorId: Float!
+
+  """ID of the course"""
+  courseId: Float!
+
+  """Title of the form"""
+  title: String!
+
+  """Optional description of the form"""
+  description: String
+
+  """Due date of the event"""
+  dueDate: DateTime!
 }
