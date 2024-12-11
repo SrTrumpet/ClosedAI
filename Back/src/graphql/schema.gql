@@ -100,6 +100,21 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type Response {
+  """Unique identifier of the form"""
+  id: ID!
+
+  """ID del formulario"""
+  formId: Float!
+
+  """ID del usuario"""
+  userId: Float!
+
+  """List of answers in the form"""
+  answers: [String!]!
+  submittedAt: DateTime!
+}
+
 type Query {
   getAllNotices: [NoticeEntity!]!
 
@@ -123,6 +138,7 @@ type Query {
 
   """Fetch a form by ID"""
   form(id: ID!): Form
+  getId(id: Float!): Float!
 }
 
 type Mutation {
@@ -165,6 +181,7 @@ type Mutation {
 
   """Delete a form by ID"""
   removeForm(id: ID!): Boolean!
+  createResponse(responseDto: ResponseDto!): Response!
 }
 
 input CreateUserDto {
@@ -224,4 +241,15 @@ input CreateFormDto {
 
   """List of questions in the form"""
   questions: [String!]!
+}
+
+input ResponseDto {
+  """ID of the user who submitted the response"""
+  userId: Float!
+
+  """ID of the form being answered"""
+  formId: Float!
+
+  """List of answers in the form"""
+  answers: [String!]!
 }

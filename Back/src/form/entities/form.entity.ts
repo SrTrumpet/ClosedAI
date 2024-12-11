@@ -2,7 +2,7 @@ import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 
 @ObjectType({ description: 'Entity representing a form with questions' })
-@Entity('forms')
+@Entity('forms_entity')
 export class Form {
   @Field(() => ID, { description: 'Unique identifier of the form' })
   @PrimaryGeneratedColumn()

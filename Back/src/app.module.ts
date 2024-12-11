@@ -11,6 +11,7 @@ import { join } from 'path';
 import { GradesModule } from './grades/grades.module';
 import { PubSub } from 'graphql-subscriptions';
 import { FormsModule } from './form/forms.module';
+import { ResponsesModule } from './form/response.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { FormsModule } from './form/forms.module';
     SubjectModule,
     GradesModule,
     FormsModule,
+    ResponsesModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',

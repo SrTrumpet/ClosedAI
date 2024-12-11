@@ -2,6 +2,8 @@ import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
 import { FormsService } from './forms.service';
 import { Form } from './entities/form.entity';
 import { CreateFormDto } from './dto/create-form.dto';
+import { Response } from './entities/form-response.entity';
+import { ResponseDto } from './dto/response.dto';
 
 @Resolver(() => Form)
 export class FormsResolver {
@@ -26,4 +28,11 @@ export class FormsResolver {
   removeForm(@Args('id', { type: () => ID }) id: number): Promise<boolean> {
     return this.formsService.remove(id);
   }
+
+  @Query(() => Number)
+  async getId(@Args('id', { type: () => Number }) id: number): Promise<number> {
+    const form = await this.formsService.findOne(id);
+    return form.id;
+  }
+
 }

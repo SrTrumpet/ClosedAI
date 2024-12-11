@@ -1,18 +1,26 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, CreateDateColumn, JoinColumn } from 'typeorm';
-import { Form } from './form.entity';
+import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity('responses')
+@ObjectType() // Agregar el decorador ObjectType para GraphQL
+@Entity('responses_entity')
 export class Response {
-  @PrimaryGeneratedColumn('uuid', { comment: 'Unique identifier for the response' })
-  id: string;
+  @Field(() => ID, { description: 'Unique identifier of the form' })
+  @PrimaryGeneratedColumn()
+  id: number;
 
-  @ManyToOne(() => Form, (form) => form.id, { onDelete: 'CASCADE', nullable: false })
-  @JoinColumn({ name: 'form_id' }) // Define el nombre de la columna para mayor claridad.
-  form: Form;
+  @Column()
+  @Field({ description: 'ID del formulario' })
+  formId: number;
 
-  @Column('json', { comment: 'Stores answers as a JSON object' }) // Cambiar a 'json' si usas MySQL.
-  answers: Record<string, any>;
+  @Column()
+  @Field({ description: 'ID del usuario' })
+  userId: number;
+
+  @Field(() => [String], { description: 'List of answers in the form' })
+  @Column('simple-array')
+  answers: string[];
 
   @CreateDateColumn({ comment: 'Date when the response was submitted' })
+  @Field()  // Agregar campo a GraphQL
   submittedAt: Date;
 }
