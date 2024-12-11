@@ -12,11 +12,7 @@ export class CreateAsistItemDto {
 
     @Field()
     asist: number;
-
-    @Field()
-    absences: number; 
 }
-
 
 @InputType()
 export class CreateAsistDto {

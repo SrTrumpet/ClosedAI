@@ -59,4 +59,8 @@ export class CourseService{
         await this.courseRepository.update({ id: existCourse.id }, updateData);
         return true;
     }
+
+    async getAllCourses(): Promise<CourseEntity[]> {
+        return this.courseRepository.find({ relations: ['subjects'] }); 
+    }
 }

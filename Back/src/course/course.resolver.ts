@@ -24,4 +24,9 @@ export class CourseResolver{
     async updateCourseDto(@Args('updateCourseDto') updateCourseDto: UpdateCourseDto): Promise<boolean>{
         return this.courseService.updateCourse(updateCourseDto);
     }
+
+    @Query(() => [CourseEntity])
+    async getAllCourse(): Promise<CourseEntity[]> {
+        return this.courseService.getAllCourses();
+    }
 }
