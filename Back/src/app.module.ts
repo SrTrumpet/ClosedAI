@@ -9,8 +9,11 @@ import { GradesModule } from './grades/grades.module';
 import { CourseModule } from './course/course.module';
 import { SemesterModule } from './semester/semester.module';
 import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig} from '@nestjs/apollo';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
+import { PubSub } from 'graphql-subscriptions';
+import { FormsModule } from './form/forms.module';
+import { ResponsesModule } from './form/response.module';
 
 @Module({
   imports: [
@@ -22,7 +25,8 @@ import { join } from 'path';
     GradesModule,
     CourseModule,
     SemesterModule,
-    
+    FormsModule,
+    ResponsesModule,
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
@@ -34,13 +38,32 @@ import { join } from 'path';
       synchronize: true,
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver:ApolloDriver,
+      driver: ApolloDriver,
       autoSchemaFile: {
         path: join(process.cwd(), 'src', 'graphql', 'schema.gql'),
       },
       playground: true,
-      context: ({ req }) => ({ req }),
+      context: ({ req, connection }) => ({
+        req,
+        ...(connection ? connection.context : {}),
+      }),
+
+      // Configuración para WebSocket y suscripciones
+      subscriptions: {
+        'graphql-ws': { // WebSocket GraphQL subscriptions (Apollo Server 3.x+)
+          path: '/graphql',
+        },
+        'subscriptions-transport-ws': { // Legacy WebSocket transport para compatibilidad
+          path: '/graphql',
+        },
+      },
     }),
+  ],
+  providers: [
+    {
+      provide: 'PUB_SUB',
+      useValue: new PubSub(),  // Proveedor del PubSub para las suscripciones
+    },
   ],
 })
 export class AppModule {}
