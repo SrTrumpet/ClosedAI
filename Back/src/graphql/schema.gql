@@ -74,6 +74,47 @@ type GradeEntity {
   subjectId: Float!
 }
 
+"""Entity representing a form with questions"""
+type Form {
+  """Unique identifier of the form"""
+  id: ID!
+
+  """Title of the form"""
+  title: String!
+
+  """Optional description of the form"""
+  description: String
+
+  """List of questions in the form"""
+  questions: [String!]!
+
+  """Date when the form was created"""
+  createdAt: DateTime!
+
+  """Date when the form was last updated"""
+  updatedAt: DateTime
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Response {
+  """Unique identifier of the form"""
+  id: ID!
+
+  """ID del formulario"""
+  formId: Float!
+
+  """ID del usuario"""
+  userId: Float!
+
+  """List of answers in the form"""
+  answers: [String!]!
+  submittedAt: DateTime!
+}
+
 type Query {
   getAllNotices: [NoticeEntity!]!
 
@@ -91,6 +132,16 @@ type Query {
   gradesBySubjectId(subjectId: Float!): [GradeEntity!]!
   findGradeById(id: Float!): GradeEntity!
   getAllGrades: [GradeEntity!]!
+
+  """Fetch all forms"""
+  forms: [Form!]!
+
+  """Fetch a form by ID"""
+  form(id: ID!): Form
+  getId(id: Float!): Float!
+  getAllResponses: [Response!]!
+  getResponsesByFormId(formId: Float!): [Response!]!
+  getResponseById(id: Float!): Response!
   gradesByStudentAndSubject(studentId: Float!, subjectId: Float!): [GradeEntity!]!
   averageGradeByStudentAndSubject(studentId: Float!, subjectId: Float!): Float!
 }
@@ -129,6 +180,12 @@ type Mutation {
   createGrade(createGradeDto: CreateGradeDto!): GradeEntity!
   updateGrade(id: Float!, updateGradeDto: UpdateGradeDto!): GradeEntity!
   deleteGrade(id: Float!): Boolean!
+
+  """Create a new form"""
+  createForm(createFormInput: CreateFormDto!): Form!
+
+  """Delete a form by ID"""
+  removeForm(id: ID!): Boolean!
 }
 
 input CreateUserDto {
@@ -178,4 +235,15 @@ input UpdateGradeDto {
   grade: Float
   studentId: Float
   subjectId: Float
+}
+
+input CreateFormDto {
+  """Title of the form"""
+  title: String!
+
+  """Optional description of the form"""
+  description: String
+
+  """List of questions in the form"""
+  questions: [String!]!
 }
