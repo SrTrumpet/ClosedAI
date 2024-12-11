@@ -1,21 +1,27 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { WsAdapter } from '@nestjs/platform-ws';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
-  // Configuración CORS más específica
+
+  // Configuración global de CORS
   app.enableCors({
-    origin: '*', // Permitir conexiones desde cualquier origen, ajusta según sea necesario
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: 'Content-Type, Accept',
+    origin: '*',  // Permite todas las conexiones
+    credentials: true,  // Asegura que se manejen las credenciales (cookies, cabeceras, etc.)
   });
 
-  // Habilitar WebSocket para GraphQL
-  app.useWebSocketAdapter(new WsAdapter(app));
+  // Habilitar el uso de la validación global de los DTOs
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true,  // Convierte los datos entrantes a su tipo correcto
+    whitelist: true,  // Elimina cualquier propiedad no definida en los DTOs
+    forbidNonWhitelisted: true,  // Lanza un error si se encuentra propiedades no permitidas
+  }));
 
-  // Escuchar en el puerto 3000
-  await app.listen(3000);
+  // Inicialización del servidor y habilitación de WebSocket para suscripciones
+  await app.listen(3000, () => {
+    console.log('Servidor corriendo en http://localhost:3000');
+  });
 }
+
 bootstrap();
