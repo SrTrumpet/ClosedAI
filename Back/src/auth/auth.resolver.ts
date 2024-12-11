@@ -32,10 +32,8 @@ export class AuthResolver {
         return this.authService.forgotpass(forgotpass);
     }
 
-    // Mutation para registrar un nuevo usuario
     @Mutation(returns => AuthResponse)
     async register(@Args() registerDto: RegisterDto): Promise<AuthResponse> {
-        // Llama al servicio de autenticación para manejar el registro
         return this.authService.register(registerDto);
     }
 

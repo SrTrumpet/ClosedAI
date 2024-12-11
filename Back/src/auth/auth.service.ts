@@ -87,7 +87,7 @@ export class AuthService {
         }
 
         // Agrega el nuevo usuario
-        await this.userService.addNewUser({
+        await this.userService.saveUser({
             firstName,
             lastName,
             rut,

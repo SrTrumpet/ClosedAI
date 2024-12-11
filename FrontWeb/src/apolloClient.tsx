@@ -7,7 +7,7 @@ import {
   
 
   const httpLink = createHttpLink({
-    uri: "https://manufacturer-banner-crafts-subaru.trycloudflare.com/graphql", 
+    uri: "https://canal-liz-dui-function.trycloudflare.com/graphql", 
   });
   
 

@@ -7,84 +7,129 @@ import { UserRoles } from "./enums/user-roles.enums";
 import { AuthEntity } from "src/auth/entity/auth.entity";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateUserDto } from "./dto/update-user.dto";
+import * as nodemailer from 'nodemailer';
 
 @Injectable()
-// Define el servicio de usuarios, responsable de manejar la lógica de negocio relacionada con los usuarios
 export class UserService {
 
     constructor(
-        // Inyecta el repositorio de UserEntity para interactuar con la base de datos de usuarios
         @InjectRepository(UserEntity)
         private readonly userRepository: Repository<UserEntity>,
-
-        // Inyecta el repositorio de AuthEntity para interactuar con las credenciales de autenticación
         @InjectRepository(AuthEntity)
         private readonly authRepository: Repository<AuthEntity>,
     ) {}
 
-    // Método para agregar un nuevo usuario
     async addNewUser(createUserDto: CreateUserDto): Promise<UserEntity> {
         const { role, password, ...userData } = createUserDto;
-        
-        // Verifica si se proporciona un rol, de lo contrario lanza una excepción
         if (!role) {
             throw new BadRequestException('El campo role es obligatorio');
         }
+
+        const rut = createUserDto.rut
+        const email = createUserDto.email
+
+        const existUserByRut = await this.userRepository.findOne({ where: { rut } });
+        if (existUserByRut) {
+            throw new BadRequestException(`El RUT ${rut} ya está registrado en el sistema.`);
+        }
+
+        const existingUserByEmail = await this.userRepository.findOne({ where: { email } });
+        if (existingUserByEmail) {
+            throw new BadRequestException(`El email ${email} ya está registrado en el sistema.`);
+        }
         
-        // Crea una nueva instancia de usuario con los datos proporcionados
         const newUser = this.userRepository.create({
             ...userData,
             role,
         });
-        // Guarda el nuevo usuario en la base de datos
         const savedUser = await this.userRepository.save(newUser);
         
-        // Si el rol es Teacher, Admin o Parents, maneja la creación de credenciales de autenticación
         if (role === UserRoles.Teacher || role === UserRoles.Admin || role === UserRoles.Parents) {
-            // Verifica si se proporciona una contraseña, de lo contrario lanza una excepción
             if (!password) {
-                throw new BadRequestException('Se requiere una contraseña para roles Teacher o Admin');
+                throw new BadRequestException('Se requiere una contraseña para roles Teacher, Admin o Parent');
             }
-            // Hashea la contraseña proporcionada
             const hashedPassword = await bcrypt.hash(password, 10);
-            // Crea una nueva instancia de AuthEntity para almacenar las credenciales
             const authEntity = this.authRepository.create({
                 idUser: savedUser.id,
                 password: hashedPassword,
+                isChangePass: true
             });
-            // Guarda las credenciales en la base de datos
             await this.authRepository.save(authEntity);
+            await this.sendCredentialsEmail(email, password);
         }
-        
-        // Devuelve el usuario guardado
         return savedUser;
     }
 
-    // Método para eliminar un usuario dado su RUT
+    async saveUser(createUserDto: CreateUserDto): Promise<UserEntity>{
+        const { role, password, ...userData } = createUserDto;
+        if (!role) {
+            throw new BadRequestException('El campo role es obligatorio');
+        }
+
+        const existingUserByRut = await this.userRepository.findOne({ where: { rut: createUserDto.rut } });
+        if (existingUserByRut) {
+            throw new BadRequestException(`El RUT ${createUserDto.rut} ya está registrado en el sistema.`);
+        }
+
+        const existingUserByEmail = await this.userRepository.findOne({ where: { email: createUserDto.email} });
+        if (existingUserByEmail) {
+            throw new BadRequestException(`El email ${createUserDto.email} ya está registrado en el sistema.`);
+        }
+        
+        const newUser = this.userRepository.create({
+            ...userData,
+            role,
+        });
+        const savedUser = await this.userRepository.save(newUser);
+        
+        if (role === UserRoles.Teacher || role === UserRoles.Admin || role === UserRoles.Parents) {
+            if (!password) {
+                throw new BadRequestException('Se requiere una contraseña para roles Teacher, Admin o Parent');
+            }
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const authEntity = this.authRepository.create({
+                idUser: savedUser.id,
+                password: hashedPassword,
+                isChangePass: true
+            });
+            await this.authRepository.save(authEntity);
+        }
+        return savedUser;
+    }
+
     async deleteUser(rut: string): Promise<boolean> {
-        // Busca al usuario por su RUT
         const user = await this.userRepository.findOne({ where: { rut } });
-        // Si el usuario no existe, lanza una excepción
         if (!user) {
             throw new BadRequestException('Usuario no encontrado');
         }
-        // Elimina al usuario de la base de datos
+        const authEntry = await this.authRepository.findOne({where:{ idUser: user.id }});
+        if (!authEntry) {
+            throw new BadRequestException ("Llame a soporte, se viene serio mi chamo!");
+        }
         await this.userRepository.remove(user);
-        // Devuelve true si la eliminación fue exitosa
+        await this.authRepository.remove(authEntry);
         return true;
     }
 
-    // Método para actualizar la información de un usuario dado su RUT
     async updateUser(rut: string, updateUserDto: UpdateUserDto): Promise<UserEntity> {
-        // Busca al usuario por su RUT
+
         const user = await this.userRepository.findOne({ where: { rut } });
-        
-        // Si el usuario no existe, lanza una excepción
+        console.log(user);
+
         if (!user) {
             throw new BadRequestException(`Usuario con rut ${rut} no encontrado`);
         }
+        const emailCheck = await this.userRepository.findOne({where: {email: updateUserDto.email}});
+        
+        if (updateUserDto.email) {
+            const emailCheck = await this.userRepository.findOne({ where: { email: updateUserDto.email } });
+            console.log(emailCheck);
 
-        // Actualiza la información del usuario si se proporcionan nuevos datos
+            if (emailCheck && emailCheck.id !== user.id) {
+                throw new BadRequestException("El email ingresado ya está en uso por otro usuario!");
+            }
+            user.email = updateUserDto.email;
+        }
         if (updateUserDto.firstName) {
             user.firstName = updateUserDto.firstName;
         }
@@ -94,8 +139,6 @@ export class UserService {
         if (updateUserDto.email) {
             user.email = updateUserDto.email;
         }
-
-        // Guarda los cambios en la base de datos y devuelve el usuario actualizado
         return await this.userRepository.save(user);
     }
 
@@ -156,5 +199,50 @@ export class UserService {
 
     async updateChangePass(id: number, newIsChangePass: boolean): Promise<void>{
         await this.authRepository.update(id, {isChangePass: newIsChangePass});
+    }
+
+
+
+
+    async sendCredentialsEmail(email:string, password:string){
+        // Configura el transportador de correo usando Gmail
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'marcapp.service@gmail.com',
+            pass: 'vgwe mwnv insd dmyw'
+        }
+    });
+
+    // Define las opciones del correo electrónico
+    const mailOptions = {
+        from: '"MarcApp" <marcapp.service@gmail.com>',
+        to: email,
+        subject: 'Credenciales de acceso a MarcApp',
+        text: `Hola,\n\nTus credenciales de acceso a MarcApp son:\n\nUsuario: ${email}\nContraseña: ${password}\n\nTe recomendamos cambiar tu contraseña después de iniciar sesión.\n\nSaludos,\nEquipo de MarcApp`,
+        html: `
+            <html>
+                <body>
+                    <div style="font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; color: #333;">
+                        <h2>Hola,</h2>
+                        <p>Tus credenciales de acceso a <strong>MarcApp</strong> son:</p>
+                        <p style="font-size: 18px; color: #555;">
+                            <strong>Usuario:</strong> ${email}<br><br>
+                            <strong>Contraseña:</strong> <span style="background-color: #f0f0f0; padding: 8px 12px; border-radius: 4px; font-weight: bold;">${password}</span>
+                        </p>
+                        <p>Te recomendamos cambiar esta contraseña por una propia tan pronto como inicies sesión.</p>
+                        <p>Si tienes alguna consulta, no dudes en contactarnos.</p>
+                        <footer>
+                            <p>Saludos cordiales,</p>
+                            <p>Equipo de <strong>MarcApp</strong></p>
+                        </footer>
+                    </div>
+                </body>
+            </html>
+        `
+    };
+
+    // Envía el correo electrónico
+    await transporter.sendMail(mailOptions);
     }
 }
