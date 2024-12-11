@@ -1,8 +1,8 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { IsNotEmpty, IsString, IsArray, ArrayNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsString, IsDate } from 'class-validator';
 
 @InputType()
-export class CreateFormDto {
+export class CreateEventDto {
 
   @Field({ description: 'ID of the user who submitted the form' })
   @IsNotEmpty()
@@ -21,8 +21,8 @@ export class CreateFormDto {
   @IsString({ message: 'The description must be a string' })
   description?: string;
 
-  @Field(() => [String], { description: 'List of questions in the form' })
-  @IsArray({ message: 'Questions must be an array' })
-  @ArrayNotEmpty({ message: 'Questions cannot be empty' })
-  questions: string[];
+  @Field({ description: 'Due date of the event' })
+  @IsNotEmpty({ message: 'The due date field is required' })
+  @IsDate({ message: 'The due date must be a valid date' })
+  dueDate: Date;
 }

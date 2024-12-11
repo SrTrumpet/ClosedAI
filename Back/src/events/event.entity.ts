@@ -2,9 +2,9 @@ import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 
 @ObjectType({ description: 'Entity representing a form with questions' })
-@Entity('forms_entity')
-export class Form {
-  @Field(() => ID, { description: 'Unique identifier of the form' })
+@Entity('events_entity')
+export class Event {
+  @Field(() => ID, { description: 'Unique identifier of the event' })
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -24,12 +24,12 @@ export class Form {
   @Column({ nullable: true })
   description: string;
 
-  @Field(() => [String], { description: 'List of questions in the form' })
-  @Column('simple-array')
-  questions: string[];
-
   @Field({ description: 'Date when the form was created' })
   @CreateDateColumn()
   createdAt: Date;
+
+  @Field({ description: 'Date when the form has to be completed' })
+  @CreateDateColumn()
+  dueDate: Date;
 
 }

@@ -78,6 +78,35 @@ type NoticeResponse {
   isCreateNotice: Boolean!
 }
 
+"""Entity representing a form with questions"""
+type Form {
+  """Unique identifier of the form"""
+  id: ID!
+
+  """ID del creador"""
+  creatorId: Float!
+
+  """ID del curso"""
+  courseId: Float!
+
+  """Title of the form"""
+  title: String!
+
+  """Optional description of the form"""
+  description: String
+
+  """List of questions in the form"""
+  questions: [String!]!
+
+  """Date when the form was created"""
+  createdAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 """
 La entidad Grade que representa una calificación de un estudiante en una asignatura
 """
@@ -92,6 +121,45 @@ type GradeEntity {
 
   """ID de la asignatura"""
   subjectId: Float!
+}
+
+"""Entity representing a form with questions"""
+type Event {
+  """Unique identifier of the event"""
+  id: ID!
+
+  """ID del creador"""
+  creatorId: Float!
+
+  """ID del curso"""
+  courseId: Float!
+
+  """Title of the form"""
+  title: String!
+
+  """Optional description of the form"""
+  description: String
+
+  """Date when the form was created"""
+  createdAt: DateTime!
+
+  """Date when the form has to be completed"""
+  dueDate: DateTime!
+}
+
+type Response {
+  """Unique identifier of the form"""
+  id: ID!
+
+  """ID del formulario"""
+  formId: Float!
+
+  """ID del usuario"""
+  userId: Float!
+
+  """List of answers in the form"""
+  answers: [String!]!
+  submittedAt: DateTime!
 }
 
 type Query {
@@ -132,8 +200,17 @@ type Query {
   getAllResponses: [Response!]!
   getResponsesByFormId(formId: Float!): [Response!]!
   getResponseById(id: Float!): Response!
+<<<<<<< HEAD
   gradesByStudentAndSubject(studentId: Float!, subjectId: Float!): [GradeEntity!]!
   averageGradeByStudentAndSubject(studentId: Float!, subjectId: Float!): Float!
+=======
+
+  """Fetch all events"""
+  events: [Event!]!
+
+  """Fetch an event by ID"""
+  event(id: ID!): Event
+>>>>>>> flo2
 }
 
 type Mutation {
@@ -189,6 +266,21 @@ type Mutation {
   createGrade(createGradeDto: CreateGradeDto!): GradeEntity!
   updateGrade(id: Float!, updateGradeDto: UpdateGradeDto!): GradeEntity!
   deleteGrade(id: Float!): Boolean!
+
+  """Create a new form"""
+  createForm(createFormInput: CreateFormDto!): Form!
+
+  """Delete a form by ID"""
+  removeForm(id: ID!): Boolean!
+
+  """Create a new response for a form"""
+  createResponse(responseDto: ResponseDto!): Response!
+
+  """Create a new event"""
+  createEvent(createEventDto: CreateEventDto!): Event!
+
+  """Delete an event by ID"""
+  removeEvent(id: ID!): Boolean!
 }
 
 input CreateUserDto {
@@ -246,4 +338,49 @@ input UpdateGradeDto {
   grade: Float
   studentId: Float
   subjectId: Float
+}
+
+input CreateFormDto {
+  """ID of the user who submitted the form"""
+  creatorId: Float!
+
+  """ID of the course"""
+  courseId: Float!
+
+  """Title of the form"""
+  title: String!
+
+  """Optional description of the form"""
+  description: String
+
+  """List of questions in the form"""
+  questions: [String!]!
+}
+
+input ResponseDto {
+  """ID of the user who submitted the response"""
+  userId: Float!
+
+  """ID of the form being answered"""
+  formId: Float!
+
+  """List of answers in the form"""
+  answers: [String!]!
+}
+
+input CreateEventDto {
+  """ID of the user who submitted the form"""
+  creatorId: Float!
+
+  """ID of the course"""
+  courseId: Float!
+
+  """Title of the form"""
+  title: String!
+
+  """Optional description of the form"""
+  description: String
+
+  """Due date of the event"""
+  dueDate: DateTime!
 }
