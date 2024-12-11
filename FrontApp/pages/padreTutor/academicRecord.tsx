@@ -3,6 +3,7 @@ import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, ScrollView, 
 import { useQuery } from '@apollo/client';
 import { GET_STUDENTS, GET_SUBJECTS, GET_ATTENDANCES_BY_SUBJECT, GET_GRADES_BY_STUDENT_AND_SUBJECT } from '../../graphql/queries';
 import { clientUser } from '../../graphql/apollo/apolloClient';
+import { useNavigation } from '@react-navigation/native';
 import styles from '../../styles/padreTutor/academicRecord.styles';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
@@ -13,6 +14,7 @@ function AcademicRecord() {
   const [attendanceData, setAttendanceData] = useState<any[]>([]);
   const [gradesData, setGradesData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const navigation = useNavigation();
 
   // Obtener lista de estudiantes
   const { data: studentsData, loading: studentsLoading } = useQuery(GET_STUDENTS, {
@@ -523,15 +525,24 @@ const generatePdf = async () => {
             Notas de {selectedUser.firstName} {selectedUser.lastName}
           </Text>
           {renderGradesTable()}
-          <TouchableOpacity 
-            style={styles.button} 
-            onPress={() => setSelectedUser(null)}
-          >
-            <Text style={styles.buttonText}>Volver</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.button} onPress={generatePdf}>
-            <Text style={styles.buttonText}>Generar PDF</Text>
-          </TouchableOpacity>
+
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity 
+              style={styles.button} 
+              onPress={() => setSelectedUser(null)}
+            >
+              <Text style={styles.buttonText}>Volver</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={generatePdf}>
+              <Text style={styles.buttonText}>Generar PDF</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.button} 
+              onPress={() => navigation.navigate('Suggestions' as never)}
+            >
+              <Text style={styles.buttonText} >Justificaciones o Reclamos</Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
       )}
     </View>

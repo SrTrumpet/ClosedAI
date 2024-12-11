@@ -115,6 +115,12 @@ type Form {
   """Unique identifier of the form"""
   id: ID!
 
+  """ID del creador"""
+  creatorId: Float!
+
+  """ID del curso"""
+  courseId: Float!
+
   """Title of the form"""
   title: String!
 
@@ -126,9 +132,6 @@ type Form {
 
   """Date when the form was created"""
   createdAt: DateTime!
-
-  """Date when the form was last updated"""
-  updatedAt: DateTime
 }
 
 type Response {
@@ -352,6 +355,12 @@ input UpdateSemesterDto {
 }
 
 input CreateFormDto {
+  """ID of the user who submitted the form"""
+  creatorId: Float!
+
+  """ID of the course"""
+  courseId: Float!
+
   """Title of the form"""
   title: String!
 

@@ -181,7 +181,8 @@ export const CREATE_FORM = gql`
       description
       questions
       createdAt
-      updatedAt
+      creatorId
+      courseId
     }
   }
 `;

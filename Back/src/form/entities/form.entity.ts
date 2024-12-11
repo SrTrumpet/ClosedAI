@@ -8,6 +8,14 @@ export class Form {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column()
+  @Field({ description: 'ID del creador' })
+  creatorId: number;
+
+  @Column()
+  @Field({ description: 'ID del curso' })
+  courseId: number;
+
   @Field({ description: 'Title of the form' })
   @Column()
   title: string;
@@ -24,7 +32,4 @@ export class Form {
   @CreateDateColumn()
   createdAt: Date;
 
-  @Field({ nullable: true, description: 'Date when the form was last updated' })
-  @UpdateDateColumn()
-  updatedAt: Date;
 }

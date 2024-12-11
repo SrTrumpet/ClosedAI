@@ -8,13 +8,19 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
-    width: '100%',
-    marginBottom: 20,
+    width: screenWidth * 0.25, 
+    marginHorizontal: 5, 
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginTop: 20,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   cell: {
     flex: 1,
