@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, ScrollView, Alert } from 'react-native';
 import { useQuery } from '@apollo/client';
 import { GET_STUDENTS, GET_SUBJECTS, GET_ATTENDANCES_BY_SUBJECT, GET_GRADES_BY_STUDENT_AND_SUBJECT } from '../../graphql/queries';
 import { clientUser } from '../../graphql/apollo/apolloClient';
 import styles from '../../styles/padreTutor/academicRecord.styles';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+import * as Print from 'expo-print';
 
 function AcademicRecord() {
   const [selectedUser, setSelectedUser] = useState<{ id: string; firstName: string; lastName: string } | null>(null);
@@ -84,10 +87,10 @@ function AcademicRecord() {
               query: GET_GRADES_BY_STUDENT_AND_SUBJECT,
               variables: { studentId: parseFloat(selectedUser.id), subjectId: parseFloat(subject.id) }
             });
-            console.log('Fetching grades for data:', data);
+            
             return {
               subject,
-              grades: data.gradesByStudentAndSubject || []
+              grades: data.gradesByStudentIdAndSubjectId || []
             };
           } catch (error) {
             console.error(`Error fetching grades for subject ${subject.id}:`, error);
@@ -299,7 +302,7 @@ const renderTable = () => {
   );
 
   const totalPercentage = calculatePercentage(totals.attendances, totals.absences);
-
+  
   return (
     <View style={styles.tableContainer}>
       <View style={[styles.row, styles.tableHeader]}>
@@ -346,6 +349,148 @@ const renderTable = () => {
   );
 };
 
+const generatePdfContent = () => {
+  if (!selectedUser || (!attendanceData.length && !gradesData.length)) return '';
+
+  // Asistencias
+  const attendanceTableRows = attendanceData.map(({ subject, attendance }) => {
+    const attendanceColor = parseFloat(attendance.percentage) < 80 ? '#ff4d4d' : '#4CAF50';
+    return `
+      <tr>
+        <td>${subject.name}</td>
+        <td>${attendance.totalAsist}</td>
+        <td>${attendance.totalAbsences}</td>
+        <td style="color: ${attendanceColor};">${attendance.percentage}%</td>
+      </tr>
+    `;
+  }).join('');
+
+  // Notas
+  const gradesTableRows = gradesData.map(({ subject, grades }) => {
+    const gradesColumns = grades.map((grade: { grade: any; }) => {
+      const gradeColor = parseFloat(grade.grade) < 4.0 ? 'red' : 'green';
+      return `<td style="color: ${gradeColor};">${grade.grade}</td>`;
+    }).join('');
+    const average = calculateAverage(grades.map((g: { grade: any; }) => g.grade));
+    const averageColor = parseFloat(average) < 4.0 ? 'red' : 'green';
+    return `
+      <tr>
+        <td>${subject.name}</td>
+        ${gradesColumns}
+        <td style="color: ${averageColor};">${average}</td>
+      </tr>
+    `;
+  }).join('');
+
+  return `
+    <html>
+      <head>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+          }
+          h1 {
+            text-align: center;
+            color: #333;
+          }
+          h2 {
+            margin-top: 30px;
+            color: #333;
+          }
+          table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+          }
+          th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+          }
+          th {
+            background-color: #f4f4f4;
+            color: #333;
+          }
+          .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 12px;
+            color: #777;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>Informe Académico de ${selectedUser.firstName} ${selectedUser.lastName}</h1>
+
+        <h2>Asistencias</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Asignatura</th>
+              <th>Asistencias</th>
+              <th>Faltas</th>
+              <th>Porcentaje</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${attendanceTableRows}
+          </tbody>
+        </table>
+
+        <h2>Notas</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Asignatura</th>
+              ${gradesData[0].grades.map((_: any, index: number) => `<th>Nota ${index + 1}</th>`).join('')}
+              <th>Promedio</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${gradesTableRows}
+          </tbody>
+        </table>
+
+        <div class="footer">
+          <p>Generado por el sistema educativo</p>
+        </div>
+      </body>
+    </html>
+  `;
+};
+
+const generatePdf = async () => {
+  const htmlContent = generatePdfContent();
+
+  
+  try {
+    // Crear el PDF desde el contenido HTML
+    const { uri } = await Print.printToFileAsync({
+      html: htmlContent,
+    });
+
+    // Guardar el archivo PDF
+    const fileUri = `${FileSystem.documentDirectory} Informe de Notas.pdf`;
+
+    await FileSystem.moveAsync({
+      from: uri,
+      to: fileUri,
+    });
+
+    // Compartir el archivo PDF
+    await Sharing.shareAsync(fileUri, {
+      mimeType: 'application/pdf',
+      dialogTitle: 'Guardar formulario como PDF',
+    });
+    
+    Alert.alert('PDF generado', 'Formulario guardado como PDF.');
+  } catch (error) {
+    console.error('Error al generar el PDF:', error);
+    Alert.alert('Error', 'No se pudo generar el archivo PDF.');
+  }
+};
+
   return (
     <View style={styles.container}>
       {!selectedUser ? (
@@ -383,6 +528,9 @@ const renderTable = () => {
             onPress={() => setSelectedUser(null)}
           >
             <Text style={styles.buttonText}>Volver</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.button} onPress={generatePdf}>
+            <Text style={styles.buttonText}>Generar PDF</Text>
           </TouchableOpacity>
         </ScrollView>
       )}

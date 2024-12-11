@@ -89,8 +89,8 @@ export const GET_GRADES_BY_SUBJECT = gql`
 `;
 
 export const GET_GRADES_BY_STUDENT_AND_SUBJECT = gql`
-  query GradesByStudentAndSubject($studentId: Float!, $subjectId: Float!) {
-    gradesByStudentAndSubject(studentId: $studentId, subjectId: $subjectId) {
+  query GradesByStudentIdAndSubjectId($studentId: Float!, $subjectId: Float!) {
+    gradesByStudentIdAndSubjectId(studentId: $studentId, subjectId: $subjectId) {
       id
       grade
       studentId
