@@ -7,7 +7,7 @@ import {
   
 
   const httpLink = createHttpLink({
-    uri: "http://localhost:3000/graphql", 
+    uri: "https://canal-liz-dui-function.trycloudflare.com/graphql", 
   });
   
 

@@ -20,9 +20,9 @@ const Anuncios: React.FC = () => {
       Swal.fire("Error", "Por favor, complete todos los campos antes de enviar.", "error");
       return;
     }
-  
+
     setIsSending(true);
-  
+
     try {
       const { data } = await createNotice({
         variables: {
@@ -31,7 +31,7 @@ const Anuncios: React.FC = () => {
           imageUrl: imageUrl.trim() || null, // Envía null si está vacío
         },
       });
-  
+
       if (data.createNotice.isCreateNotice) {
         Swal.fire("Éxito", "Notificación enviada correctamente.", "success");
         setTitle("");
@@ -48,7 +48,6 @@ const Anuncios: React.FC = () => {
       setIsSending(false);
     }
   };
-  
 
   // Muestra estado de carga o errores
   if (loading) return <p className="text-gray-500">Cargando anuncios...</p>;
@@ -118,23 +117,23 @@ const Anuncios: React.FC = () => {
           <h2 className="text-2xl font-bold text-[#1B4332] mb-4">Anuncios Publicados</h2>
           {noticesData?.getAllNotices?.length > 0 ? (
             <div className="grid gap-6">
-            {noticesData.getAllNotices.map((notice: any) => (
-              <div key={notice.id} className="p-4 border border-gray-300 rounded-lg shadow-md">
-                <h3 className="text-lg font-bold text-[#1B4332]">{notice.title}</h3>
-                <p className="text-gray-700">{notice.description}</p>
-                {notice.imageUrl ? (
-                  <img
-                    src={notice.imageUrl}
-                    alt="Imagen del anuncio"
-                    className="mt-4 rounded-lg w-full max-h-64 object-cover"
-                  />
-                ) : (
-                  <p className="text-gray-500 italic">Sin imagen</p> 
-                )}
-              </div>
-            ))}
-          </div>
-          
+              {noticesData.getAllNotices.map((notice: any) => (
+                <div key={notice.id} className="p-4 border border-gray-300 rounded-lg shadow-md">
+                  <h3 className="text-lg font-bold text-[#1B4332]">{notice.title}</h3>
+                  <p className="text-gray-700">{notice.description}</p>
+                  {notice.imageUrl ? (
+                    <img
+                      src={notice.imageUrl}
+                      alt="Imagen del anuncio"
+                      className="mt-4 rounded-lg w-full object-contain"
+                      style={{ maxWidth: "300px", maxHeight: "200px", margin: "0 auto" }}
+                    />
+                  ) : (
+                    <p className="text-gray-500 italic">Sin imagen</p>
+                  )}
+                </div>
+              ))}
+            </div>
           ) : (
             <p className="text-gray-500">No hay anuncios publicados.</p>
           )}
