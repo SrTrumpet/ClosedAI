@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 import { ObjectType, Field, ID } from '@nestjs/graphql';
 
-@ObjectType({ description: 'Entity representing a form with questions' })
+@ObjectType({ description: 'Entity representing an event' })
 @Entity('events_entity')
 export class Event {
   @Field(() => ID, { description: 'Unique identifier of the event' })
