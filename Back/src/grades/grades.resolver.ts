@@ -30,6 +30,17 @@ export class GradesResolver {
     return await this.gradesService.findGradesBySubjectId(subjectId);
   }
 
+  @Query(() => [GradeEntity], { name: 'gradesByStudentIdAndSubjectId' })
+  async gradesByStudentIdAndSubjectId(
+    @Args('studentId') studentId: number,
+    @Args('subjectId') subjectId: number,
+  ): Promise<GradeEntity[]> {
+    return await this.gradesService.findGradesByStudentIdAndSubjectId(
+      studentId,
+      subjectId,
+    );
+  }
+
   // Nueva mutación para actualizar una calificación
   @Mutation(() => GradeEntity, { name: 'updateGrade' })
   async updateGrade(
@@ -54,6 +65,8 @@ export class GradesResolver {
   async getAllGrades(): Promise<GradeEntity[]> {
     return await this.gradesService.getAllGrades(); // Llamada al servicio para obtener todas las calificaciones
   }
+
+
 
 }
 
