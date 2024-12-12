@@ -11,50 +11,54 @@ const Login: React.FC = () => {
     const navigate = useNavigate();
 
     const [login, { loading }] = useMutation(INICIO_SESION);
+    
 
     const handleLogin = async (email: string, pass: string) => {
         try {
-            const { data } = await login({
-                variables: {
-                    email,
-                    password: pass
-                }
-            });
+        const { data } = await login({
+            variables: {
+            email,
+            password: pass,
+            },
+        });
     
-            const token = data?.login?.token;
-            const isChangePassword = data?.login?.isChangePassword;
+        const token = data?.login?.token;
+        const user = {
+            id: data?.login?.id,
+            firstName: data?.login?.firstName,
+            role: data?.login?.role,
+        };
     
-            if (token) {
-                console.log("Token recibido:", token);
+        if (token) {
+            console.log("Token recibido:", token);
     
-                localStorage.setItem('authToken', token);
-                localStorage.setItem('isChangePassword', isChangePassword ? 'true' : 'false');
+            // Guardar en sessionStorage en lugar de localStorage
+            sessionStorage.setItem("authToken", token);
+            sessionStorage.setItem("user", JSON.stringify(user));
     
-                if (isChangePassword) {
-                    navigate('/ChangePassword'); 
-                } else {
-                    Swal.fire({
-                        title: '¡Éxito!',
-                        text: 'Inicio de Sesión correcto',
-                        icon: 'success',
-                        confirmButtonText: 'Ok'
-                    }).then(() => {
-                        navigate(`/HomeLogin`);
-                    });
-                }
-            } else {
-                throw new Error("Token no recibido");
-            }
-    
-        } catch (error) {
             Swal.fire({
-                title: 'Error',
-                text: 'Email o contraseña incorrectos',
-                icon: 'error',
-                confirmButtonText: 'Ok'
+            title: "¡Éxito!",
+            text: "Inicio de Sesión correcto",
+            icon: "success",
+            confirmButtonText: "Ok",
+            }).then(() => {
+            navigate(`/HomeLogin`);
             });
+        } else {
+            throw new Error("Token no recibido");
+        }
+        } catch (error) {
+        Swal.fire({
+            title: "Error",
+            text: "Email o contraseña incorrectos",
+            icon: "error",
+            confirmButtonText: "Ok",
+        });
         }
     };
+  
+      
+    
     
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();

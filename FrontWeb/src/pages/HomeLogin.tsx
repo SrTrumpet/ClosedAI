@@ -16,7 +16,8 @@ function HomeLogin() {
   const navigate = useNavigate();
   const { data: coursesData, loading: loadingCourses, error: errorCourses } = useQuery(LISTAR_CURSOS);
   const { data: noticesData, loading: loadingNotices, error: errorNotices } = useQuery(GET_ALL_NOTICES);
-
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     const isChangePassword = localStorage.getItem("isChangePassword") === "true";
@@ -60,7 +61,7 @@ function HomeLogin() {
     <div className="bg-[#DDE5B6] min-h-screen">
       <NavBar />
       <div className="container mx-auto py-12 text-center">
-        <h1 className="text-5xl font-bold text-[#1B4332] mb-8">Bienvenido</h1>
+        <h1 className="text-5xl font-bold text-[#1B4332] mb-8">Bienvenido, {user.firstName} {user.lastName}</h1>
 
         <div className="text-left px-4 text-[#1B4332]">
           <h2 className="text-3xl font-bold mb-6">Cursos Recientes</h2>

@@ -48,14 +48,6 @@ export const Mensaje = gql`
     }
 `;
 
-export const GET_USERS = gql`
-    query GetUsers {
-        user(email: "elias.manque.o@gmail.com"){
-            name
-            password
-        }
-}
-`;
 
 export const OBTENER_INFO = gql`
     query{
@@ -109,6 +101,23 @@ export const GET_ALL_STUDENTS = gql`
 
 
 
+export const GET_ALL_USERS = gql`
+  query GetAllUser {
+    getAllUser {
+      email
+      firstName
+      id
+      lastName
+      role
+      rut
+    }
+  }
+`;
+
+
+
+
+
 export const FIND_BY_RUT = gql`
   query FindByRut($rut: String!) {
     findByRut(rut: $rut) {
@@ -154,4 +163,22 @@ export const GET_ALL_NOTICES = gql`
 
 
 
-
+export const GET_MESSAGES = gql`
+  query GetMessages($senderId: Int!, $recipientId: Int!) {
+    getMessages(senderId: $senderId, recipientId: $recipientId) {
+      id
+      content
+      timestamp
+      sender {
+        id
+        firstName
+        lastName
+      }
+      recipient {
+        id
+        firstName
+        lastName
+      }
+    }
+  }
+`;

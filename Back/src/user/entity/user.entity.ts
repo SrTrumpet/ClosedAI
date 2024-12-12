@@ -1,36 +1,41 @@
-import {Entity, PrimaryGeneratedColumn, Column} from 'typeorm';
-import {ObjectType, Field, ID} from '@nestjs/graphql';
-import { UserRoles } from '../enums/user-roles.enums';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { MessageEntity } from 'src/chat/entity/message.entity';
 
 @ObjectType()
 @Entity()
 export class UserEntity {
-    @PrimaryGeneratedColumn()
-    @Field(() => ID)
-    id: number;
+  @Field(() => ID)
+  @PrimaryGeneratedColumn()
+  id: number;
 
-    @Column()
-    @Field()
-    firstName: string;
+  @Field()
+  @Column()
+  firstName: string;
 
-    @Column()
-    @Field()
-    lastName: string;
+  @Field()
+  @Column()
+  lastName: string;
 
-    @Column()
-    @Field()
-    rut: string;
+  @Field()
+  @Column({ unique: true })
+  email: string;
 
-    @Column()
-    @Field()
-    email: string;
+  @Field()
+  @Column({ unique: true })
+  rut: string;
 
-    @Column({
-        type: "enum",
-        enum: UserRoles,
-        default: UserRoles.Student,
-    })
-    
-    @Field(() => UserRoles)
-    role: UserRoles;
+  @Field()
+  @Column()
+  role: string;
+
+  // Relación con los mensajes enviados
+  @Field(() => [MessageEntity], { nullable: true }) // Exponer como un array de MessageEntity
+  @OneToMany(() => MessageEntity, (message) => message.sender)
+  sentMessages: MessageEntity[];
+
+  // Relación con los mensajes recibidos
+  @Field(() => [MessageEntity], { nullable: true }) // Exponer como un array de MessageEntity
+  @OneToMany(() => MessageEntity, (message) => message.recipient)
+  receivedMessages: MessageEntity[];
 }

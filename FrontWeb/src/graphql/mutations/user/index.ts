@@ -1,13 +1,23 @@
 import { gql } from "@apollo/client";
 
 export const INICIO_SESION = gql`
-    mutation InicioSesion($email: String!, $password: String!) {
-        login(email: $email, password: $password) {
-            token
-            isChangePassword
-            message
-        }
-    }
+    mutation Login($email: String!, $password: String!) {
+      login(email: $email, password: $password) {
+          token
+          message
+          role
+          id
+          isChangePassword
+          user {
+              id
+              firstName
+              lastName
+              email
+              rut
+              role
+          }
+      }
+  }
 `;
 
 export const FORGOT_PASS = gql`
@@ -103,7 +113,6 @@ export const CREATE_GRADE = gql`
   }
 `;
 
-
 export const UPDATE_GRADE = gql`
   mutation UpdateGrade($id: Float!, $updateGradeDto: UpdateGradeDto!) {
     updateGrade(id: $id, updateGradeDto: $updateGradeDto) {
@@ -119,3 +128,38 @@ export const DELETE_GRADE = gql`
   }
 `;
 
+export const SEND_MESSAGE = gql`
+  mutation SendMessage($content: String!, $senderId: Int!, $recipientId: Int!) {
+    sendMessage(content: $content, senderId: $senderId, recipientId: $recipientId) {
+      id
+      content
+      timestamp
+      sender {
+        id
+        firstName
+      }
+      recipient {
+        id
+        firstName
+      }
+    }
+  }
+`;
+
+export const MESSAGE_SUBSCRIPTION = gql`
+  subscription {
+    messageSent(recipientId: 2) {
+      id
+      content
+      sender {
+        id
+        firstName
+      }
+      recipient {
+        id
+        firstName
+      }
+      timestamp
+    }
+  }
+`;

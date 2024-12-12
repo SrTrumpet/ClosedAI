@@ -1,4 +1,5 @@
-import { ObjectType, Field } from "@nestjs/graphql";
+import { Field, ObjectType } from "@nestjs/graphql";
+import { UserEntity } from "src/user/entity/user.entity";
 
 @ObjectType()
 export class AuthResponse {
@@ -6,13 +7,13 @@ export class AuthResponse {
     token: string;
 
     @Field()
-    message :string;
+    message: string;
 
     @Field()
-    verificacion:boolean;
+    verificacion: boolean;
 
     @Field()
-    role : string;
+    role: string;
 
     @Field()
     firstName: string;
@@ -22,4 +23,7 @@ export class AuthResponse {
 
     @Field()
     isChangePassword: boolean;
+
+    @Field(() => UserEntity)
+    user: UserEntity; // Incluye todos los datos del usuario
 }

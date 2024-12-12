@@ -9,9 +9,9 @@ import { CourseModule } from './course/course.module';
 import { SemesterModule } from './semester/semester.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { GradesModule } from './grades/grades.module';
-import { ApolloDriver, ApolloDriverConfig} from '@nestjs/apollo';
+import { ChatModule } from './chat/chat.module'; // Importa tu ChatModule
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
-
 
 @Module({
   imports: [
@@ -23,23 +23,30 @@ import { join } from 'path';
     GradesModule,
     CourseModule,
     SemesterModule,
+    ChatModule, // Agrega el módulo de chat aquí
     TypeOrmModule.forRoot({
       type: 'mysql',
       host: 'localhost',
       port: 3308,
-      database: 'db_crud',
       username: 'crud_db',
       password: 'root',
+      database: 'db_crud',
       autoLoadEntities: true,
       synchronize: true,
     }),
     GraphQLModule.forRoot<ApolloDriverConfig>({
-      driver:ApolloDriver,
-      autoSchemaFile: {
-        path: join(process.cwd(), 'src', 'graphql', 'schema.gql'),
+      driver: ApolloDriver,
+      autoSchemaFile: join(process.cwd(), 'src/graphql/schema.gql'),
+      subscriptions: {
+        'graphql-ws': true,
       },
       playground: true,
-      context: ({ req }) => ({ req }),
+      context: ({ req, connection }) => {
+        if (connection) {
+          return { req: connection.context };
+        }
+        return { req };
+      },
     }),
   ],
 })
