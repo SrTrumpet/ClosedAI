@@ -135,6 +135,7 @@ type Query {
   ): [SubjectEntity!]!
   gradesByStudentId(studentId: Float!): [GradeEntity!]!
   gradesBySubjectId(subjectId: Float!): [GradeEntity!]!
+  gradesByStudentIdAndSubjectId(studentId: Float!, subjectId: Float!): [GradeEntity!]!
   findGradeById(id: Float!): GradeEntity!
   getAllGrades: [GradeEntity!]!
   getAllCourse: [CourseEntity!]!
