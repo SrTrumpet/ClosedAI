@@ -33,4 +33,15 @@ export class ChatsService {
     await this.chatRepository.delete(chat.id);
     return true;
   }
+
+  async getMessages(senderId: number, receiverId: number): Promise<Chat[]> {
+    return this.chatRepository.find({
+      where: [
+        { senderId, receiverId },
+        { senderId: receiverId, receiverId: senderId },
+      ],
+      order: { createdAt: 'ASC' }, // Ordena los mensajes por fecha de creación
+    });
+  }
+  
 }

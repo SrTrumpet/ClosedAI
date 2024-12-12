@@ -33,4 +33,13 @@ export class ChatsResolver {
     return chat.id;
   }
 
+  @Query(() => [Chat], { name: 'getMessages', description: 'Fetch chats between two users' })
+getMessages(
+  @Args('senderId', { type: () => Number }) senderId: number,
+  @Args('receiverId', { type: () => Number }) receiverId: number,
+): Promise<Chat[]> {
+  return this.chatsService.getMessages(senderId, receiverId);
+}
+
+
 }
