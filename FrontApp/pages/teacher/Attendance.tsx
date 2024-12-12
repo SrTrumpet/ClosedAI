@@ -72,7 +72,7 @@ function Attendance() {
       await registrarAsistencia({
         variables: {
           createAsistInput: {
-            asistencias: [{ idUser: parseInt(userData.findByRut.id), idSubject: Number(subjectId), asist: 1, absences: 0 }],
+            asistencias: [{ idUser: parseInt(userData.findByRut.id), idSubject: Number(subjectId), asist: 1 }],
           },
         },
       });

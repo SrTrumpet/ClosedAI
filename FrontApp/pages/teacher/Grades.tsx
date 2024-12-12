@@ -346,7 +346,7 @@ function Grades() {
         {grades.map((gradeObj: Grade | null, index: number) => (
         <View key={index} style={[styles.cell, { minWidth: 100 }]}>
           <Text style={getCellStyle(gradeObj?.grade ?? '')}>
-            {gradeObj ? gradeObj.grade.toFixed(1) : ''}
+              {gradeObj ? gradeObj.grade : ''}
           </Text>
           {gradeObj && (
             <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
