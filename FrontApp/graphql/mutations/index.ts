@@ -224,3 +224,21 @@ export const CREATE_RESPONSE = gql`
     }
   }
 `;
+
+export const CREATE_CHAT = gql`
+  mutation CreateChat($createChatDto: CreateChatDto!) {
+    createChat(createChatDto: $createChatDto) {
+      id
+      senderId
+      receiverId
+      content
+      createdAt
+    }
+  }
+`;
+
+export const DELETE_CHAT = gql`
+  mutation RemoveChat($id: ID!) {
+    removeChat(id: $id)
+  }
+`;

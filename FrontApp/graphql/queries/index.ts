@@ -215,3 +215,26 @@ export const GET_EVENT_BY_ID = gql`
   }
 `;
 
+export const GET_ALL_MESSAGES = gql`
+  query GetAllChats {
+    chats {
+      id
+      senderId
+      receiverId
+      content
+      createdAt
+    }
+  }
+`;
+
+export const GET_ALL_MESSAGES_BY_ID = gql`
+  query GetChatById($id: ID!) {
+    chat(id: $id) {
+      id
+      senderId
+      receiverId
+      content
+      createdAt
+    }
+  }
+`;

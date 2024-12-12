@@ -4,8 +4,8 @@ import * as SecureStore from 'expo-secure-store';
 import * as ImagePicker from 'expo-image-picker';
 import { useQuery, useMutation } from '@apollo/client';
 import { clientUser } from '../graphql/apollo/apolloClient';
-import { CREAR_ANUNCIO } from '../graphql/mutations';
-import { GET_NEWS, GET_USER_BY_RUT } from '../graphql/queries';
+import { CREAR_ANUNCIO, CREATE_CHAT } from '../graphql/mutations';
+import { GET_NEWS, GET_USER_BY_RUT, GET_USERS, GET_ALL_MESSAGES } from '../graphql/queries';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import styles from '../styles/HomeLogin.styles';
@@ -38,6 +38,48 @@ function HomeLogin() {
   const [chatVisible, setChatVisible] = useState(false);
   const [scrollY, setScrollY] = useState(0);
 
+  const [newMessage, setNewMessage] = useState('');
+
+const handleSendMessage = async () => {
+  if (!newMessage.trim()) return;
+
+  try {
+    const { data } = await createChat({
+      variables: {
+        createChatDto: {
+          senderId: userId ? parseFloat(userId) : 0,
+          receiverId: selectedUser?.id ? parseFloat(selectedUser.id) : 0,
+          content: newMessage.trim(),
+        },
+      },
+    });
+
+    const newChatMessage = data.createChat;
+    setChatMessages((prevMessages) => [newChatMessage, ...prevMessages]);
+    setNewMessage('');
+  } catch (error) {
+    console.error('Error al enviar el mensaje:', error);
+  }
+};
+
+  interface User {
+    id: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+  }
+
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  interface ChatMessage {
+    id: string;
+    senderId: string;
+    content: string;
+    createdAt: string;
+  }
+
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatWindowVisible, setChatWindowVisible] = useState(false);
+
   const { data, loading, error, refetch } = useQuery(GET_NEWS, { client: clientUser });
   const { data: userData, refetch: refetchUser } = useQuery(GET_USER_BY_RUT, {
     variables: { rut: userRut },
@@ -45,6 +87,45 @@ function HomeLogin() {
     skip: !userRut,
   });
   const [createNews] = useMutation(CREAR_ANUNCIO, { client: clientUser });
+  const [createChat] = useMutation(CREATE_CHAT, { client: clientUser });
+  const { data: getUsersData, loading: getUsersLoading, error: getUsersError } = useQuery(GET_USERS, { client: clientUser });
+
+  const filteredUsers = getUsersData?.getAllUser.filter((user: { role: string; }) => user.role !== 'Student' && user.role !== 'Admin');
+
+  const { data: messagesData, loading: messagesLoading, refetch: refetchMessages } = useQuery(GET_ALL_MESSAGES, {
+    skip: !selectedUser,
+    variables: {
+      senderId: userId,
+      receiverId: selectedUser?.id,
+    },
+    client: clientUser,
+  });
+
+  useEffect(() => {
+    if (userData && userData.findByRut) {
+      setUserId(userData.findByRut.id);
+    }
+  }, [userData]);
+
+  useEffect(() => {
+    if (!messagesData?.chats || !selectedUser || !userId) return;
+  
+    const filteredMessages = messagesData.chats.filter(
+      (message: { senderId: string; receiverId: string }) =>
+        (String(message.senderId) === String(userId) &&
+          String(message.receiverId) === String(selectedUser.id)) ||
+        (String(message.senderId) === String(selectedUser.id) &&
+          String(message.receiverId) === String(userId))
+    );
+  
+    setChatMessages(filteredMessages);
+  }, [messagesData, selectedUser, userId]);
+  
+  useEffect(() => {
+    if (messagesData) {
+      console.log('Mensajes obtenidos:', messagesData.chats);
+    }
+  }, [messagesData]);  
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -100,6 +181,14 @@ function HomeLogin() {
       </View>
     </ImageBackground>
   );
+
+  const handleSelectUser = (user: User) => {
+    setSelectedUser(user); // Guardar el usuario seleccionado
+    setChatVisible(false); // Cerrar la lista de usuarios
+    setChatWindowVisible(true); // Abrir la ventana del chat
+    refetchMessages(); // Refrescar mensajes si es necesario
+  };
+  
 
   const handleImagePicker = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -281,11 +370,95 @@ function HomeLogin() {
         <Modal visible={chatVisible} transparent animationType="slide">
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Chat</Text>
-              <Text>No tienes mensajes nuevos.</Text>
+              <Text style={styles.modalTitle}>Selecciona un Usuario</Text>
+              {getUsersLoading ? (
+                <Text>Cargando usuarios...</Text>
+              ) : getUsersError ? (
+                <Text>Error al cargar usuarios</Text>
+              ) : (
+                <FlatList
+                  data={filteredUsers}
+                  keyExtractor={(item) => item.id.toString()}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={styles.userItem}
+                      onPress={() => {
+                        handleSelectUser(item);
+                        setChatVisible(false);
+                      }}
+                    >
+                      <Text style={styles.userName}>{item.firstName} {item.lastName}</Text>
+                      <Text style={styles.userRole}>Rol: {item.role}</Text>
+                    </TouchableOpacity>
+                  )}
+                />
+              )}
               <TouchableOpacity
                 style={styles.cancelButton}
                 onPress={() => setChatVisible(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal visible={chatWindowVisible} transparent animationType="slide">
+        <View style={[styles.modalContainer, { justifyContent: 'space-between' }]}>
+        <View style={[styles.modalContent, { flex: 1, justifyContent: 'space-between' }]}>
+              <Text style={styles.modalTitle}>
+                Chat con {selectedUser?.firstName} {selectedUser?.lastName}
+              </Text>
+              <FlatList
+                data={chatMessages}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                  <View
+                  style={[
+                    styles.messageBubble,
+                    item.senderId === userId
+                      ? [styles.sentMessage, { backgroundColor: '#4CAF50' }] 
+                      : [styles.receivedMessage, { backgroundColor: '#E0E0E0' }] 
+                  ]}
+                  >
+                    <Text
+                      style={
+                        item.senderId === userId
+                          ? [styles.messageText, { color: '#FFFFFF', opacity: 0.7 }]
+                          : [styles.receivedMessageText, { color: '#000000' }] 
+                      }
+                    >
+                      {item.content}
+                    </Text>
+                    <Text
+                      style={
+                        item.senderId === userId
+                          ? [styles.messageTime, { color: '#FFFFFF', opacity: 0.7 }]
+                          : [styles.receivedMessage, { color: '#666666' }]
+                      }
+                    >
+                      {new Date(item.createdAt).toLocaleTimeString()}
+                    </Text>
+                  </View>
+                )}
+                contentContainerStyle={styles.messagesContainer}
+              />
+
+              <View style={styles.messageInputContainer}>
+                <TextInput
+                  style={styles.messageInput}
+                  placeholder="Escribe tu mensaje..."
+                  value={newMessage}
+                  onChangeText={setNewMessage}
+                />
+                <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
+                  <Text style={styles.sendButtonText}>Enviar</Text>
+                </TouchableOpacity>
+              </View>
+
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setChatWindowVisible(false)}
               >
                 <Text style={styles.cancelButtonText}>Cerrar</Text>
               </TouchableOpacity>
@@ -342,8 +515,29 @@ function HomeLogin() {
         <Modal visible={chatVisible} transparent animationType="slide">
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Chat</Text>
-              <Text>No tienes mensajes en tu historial.</Text>
+              <Text style={styles.modalTitle}>Selecciona un Usuario</Text>
+              {getUsersLoading ? (
+                <Text>Cargando usuarios...</Text>
+              ) : getUsersError ? (
+                <Text>Error al cargar usuarios</Text>
+              ) : (
+                <FlatList
+                  data={filteredUsers}
+                  keyExtractor={(item) => item.id.toString()}
+                  renderItem={({ item }) => (
+                    <TouchableOpacity
+                      style={styles.userItem}
+                      onPress={() => {
+                        handleSelectUser(item);
+                        setChatVisible(false);
+                      }}
+                    >
+                      <Text style={styles.userName}>{item.firstName} {item.lastName}</Text>
+                      <Text style={styles.userRole}>Rol: {item.role}</Text>
+                    </TouchableOpacity>
+                  )}
+                />
+              )}
               <TouchableOpacity
                 style={styles.cancelButton}
                 onPress={() => setChatVisible(false)}
@@ -353,6 +547,72 @@ function HomeLogin() {
             </View>
           </View>
         </Modal>
+
+        <Modal visible={chatWindowVisible} transparent animationType="slide">
+        <View style={[styles.modalContainer, { justifyContent: 'space-between' }]}>
+        <View style={[styles.modalContent, { flex: 1, justifyContent: 'space-between' }]}>
+              <Text style={styles.modalTitle}>
+                Chat con {selectedUser?.firstName} {selectedUser?.lastName}
+              </Text>
+              <FlatList
+                data={chatMessages}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => (
+                  <View
+                  style={[
+                    styles.messageBubble,
+                    item.senderId === userId
+                      ? [styles.sentMessage, { backgroundColor: '#4CAF50' }] 
+                      : [styles.receivedMessage, { backgroundColor: '#E0E0E0' }] 
+                  ]}
+                  >
+                    <Text
+                      style={
+                        item.senderId === userId
+                          ? [styles.messageText, { color: '#FFFFFF', opacity: 0.7 }]
+                          : [styles.receivedMessageText, { color: '#000000' }] 
+                      }
+                    >
+                      {item.content}
+                    </Text>
+                    <Text
+                      style={
+                        item.senderId === userId
+                          ? [styles.messageTime, { color: '#FFFFFF', opacity: 0.7 }]
+                          : [styles.receivedMessage, { color: '#666666' }]
+                      }
+                    >
+                      {new Date(item.createdAt).toLocaleTimeString()}
+                    </Text>
+                  </View>
+                )}
+                contentContainerStyle={styles.messagesContainer}
+              />
+
+              <View style={styles.messageInputContainer}>
+                <TextInput
+                  style={styles.messageInput}
+                  placeholder="Escribe tu mensaje..."
+                  value={newMessage}
+                  onChangeText={setNewMessage}
+                />
+                <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
+                  <Text style={styles.sendButtonText}>Enviar</Text>
+                </TouchableOpacity>
+              </View>
+
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setChatWindowVisible(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cerrar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+
+
 
           </>
         )}

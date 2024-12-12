@@ -354,27 +354,85 @@ const renderTable = () => {
 const generatePdfContent = () => {
   if (!selectedUser || (!attendanceData.length && !gradesData.length)) return '';
 
-  // Asistencias
-  const attendanceTableRows = attendanceData.map(({ subject, attendance }) => {
+  const maxGrades = gradesData.length
+  ? Math.max(...gradesData.map((s: any) => s.grades.length))
+  : 0;
+  const totalsWithAdjustedAttendance = attendanceData.map(({ subject, attendance }) => {
+    const maxAttendanceForSubject = Math.max(...attendanceData.map(
+      item => item.attendance.totalAsist
+    ));
+
+    const adjustedAbsences = maxAttendanceForSubject - attendance.totalAsist;
+    const percentage = calculatePercentage(attendance.totalAsist, adjustedAbsences);
+
+    return {
+      subject,
+      attendance: {
+        ...attendance,
+        adjustedAbsences,
+        percentage
+      }
+    };
+  });
+
+  const totals = totalsWithAdjustedAttendance.reduce(
+    (acc, { attendance }) => ({
+      attendances: acc.attendances + attendance.totalAsist,
+      absences: acc.absences + attendance.adjustedAbsences
+    }),
+    { attendances: 0, absences: 0 }
+  );
+
+  // Calcular porcentaje total de asistencia
+  const totalPercentage = calculatePercentage(totals.attendances, totals.absences);
+
+  const attendanceTableRows = totalsWithAdjustedAttendance.map(({ subject, attendance }) => {
     const attendanceColor = parseFloat(attendance.percentage) < 80 ? '#ff4d4d' : '#4CAF50';
     return `
       <tr>
         <td>${subject.name}</td>
         <td>${attendance.totalAsist}</td>
-        <td>${attendance.totalAbsences}</td>
+        <td>${attendance.adjustedAbsences}</td>
         <td style="color: ${attendanceColor};">${attendance.percentage}%</td>
       </tr>
     `;
   }).join('');
 
-  // Notas
+  const totalAttendanceRow = `
+    <tr style="background-color: #f4f4f4; font-weight: bold;">
+      <td>Total de Asistencia</td>
+      <td>${totals.attendances}</td>
+      <td>${totals.absences}</td>
+      <td style="color: ${parseFloat(totalPercentage) < 80 ? '#ff4d4d' : '#4CAF50'};">
+        ${totalPercentage}%
+      </td>
+    </tr>
+  `;
+
+  const calculateGeneralAverage = (subjects: any[]) => {
+    const subjectAverages = subjects.map((subject) => {
+      const subjectGrades = subject.grades.map((g: { grade: any; }) => g.grade);
+      return calculateAverageOfSubject(subjectGrades);
+    });
+
+    const totalAverage = subjectAverages.reduce((sum: any, avg: any) => sum + avg, 0);
+    return (totalAverage / subjectAverages.length).toFixed(2);
+  };
+  const generalAverage = calculateGeneralAverage(gradesData);
+
   const gradesTableRows = gradesData.map(({ subject, grades }) => {
-    const gradesColumns = grades.map((grade: { grade: any; }) => {
-      const gradeColor = parseFloat(grade.grade) < 4.0 ? 'red' : 'green';
-      return `<td style="color: ${gradeColor};">${grade.grade}</td>`;
+    const gradesColumns = Array(maxGrades).fill('').map((_, index) => {
+      const grade = grades[index];
+      if (grade) {
+        const gradeColor = parseFloat(grade.grade) < 4.0 ? 'red' : 'green';
+        return `<td style="color: ${gradeColor};">${grade.grade}</td>`;
+      }
+      return '<td>-</td>';
     }).join('');
+
     const average = calculateAverage(grades.map((g: { grade: any; }) => g.grade));
     const averageColor = parseFloat(average) < 4.0 ? 'red' : 'green';
+
     return `
       <tr>
         <td>${subject.name}</td>
@@ -384,6 +442,16 @@ const generatePdfContent = () => {
     `;
   }).join('');
 
+  const generalAverageRow = `
+    <tr style="background-color: #f4f4f4;">
+      <td><strong>Promedio General</strong></td>
+      ${Array(maxGrades).fill('<td>-</td>').join('')}
+      <td style="color: ${parseFloat(generalAverage) < 4.0 ? 'red' : 'green'};">
+        <strong>${generalAverage}</strong>
+      </td>
+    </tr>
+  `;
+
   return `
     <html>
       <head>
@@ -391,8 +459,26 @@ const generatePdfContent = () => {
           body {
             font-family: Arial, sans-serif;
             margin: 20px;
+            position: relative;
+          }
+          .school-header {
+            position: absolute;
+            top: -40;
+            left: 0;
+            padding: 10px;
+            background-color: rgba(106, 135, 77, 0.1);
+            border-bottom: 2px solid rgba(106, 135, 77, 0.3);
+            border-right: 2px solid rgba(106, 135, 77, 0.3);
+            border-radius: 0 0 10px 0;
+            font-weight: bold;
+            color: #4a5f36;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 14px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
           }
           h1 {
+            margin-top: 100px; /* Aumenta el espacio superior */
             text-align: center;
             color: #333;
           }
@@ -420,9 +506,12 @@ const generatePdfContent = () => {
             font-size: 12px;
             color: #777;
           }
-        </style>
+         </style>
       </head>
       <body>
+        <div class="school-header">
+          Colegio Bajos del Cerro Pequeño
+        </div>
         <h1>Informe Académico de ${selectedUser.firstName} ${selectedUser.lastName}</h1>
 
         <h2>Asistencias</h2>
@@ -437,6 +526,7 @@ const generatePdfContent = () => {
           </thead>
           <tbody>
             ${attendanceTableRows}
+            ${totalAttendanceRow}
           </tbody>
         </table>
 
@@ -445,17 +535,18 @@ const generatePdfContent = () => {
           <thead>
             <tr>
               <th>Asignatura</th>
-              ${gradesData[0].grades.map((_: any, index: number) => `<th>Nota ${index + 1}</th>`).join('')}
+              ${Array(maxGrades).fill('').map((_, index) => `<th>Nota ${index + 1}</th>`).join('')}
               <th>Promedio</th>
             </tr>
           </thead>
           <tbody>
             ${gradesTableRows}
+            ${generalAverageRow}
           </tbody>
         </table>
 
         <div class="footer">
-          <p>Generado por el sistema educativo</p>
+          <p>Para más información, contactarse con su docente en la sección "Ver sugerencias o reclamos"</p>
         </div>
       </body>
     </html>

@@ -64,6 +64,13 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
   },
+  chatContent: {
+    width: '90%',
+    height: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 10,
+  },
   container: {
     flex: 1,
     backgroundColor: '#d1f7ab',
@@ -149,6 +156,50 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 15,
   },
+  messageBubble: {
+    padding: 10,
+    marginVertical: 5,
+    borderRadius: 15,
+    maxWidth: '75%',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  messageInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    fontSize: 16,
+    marginRight: 10,
+  },
+  messageInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#ddd',
+    backgroundColor: '#fff',
+  },
+  messagesContainer: {
+    paddingVertical: 10,
+    flexGrow: 1,
+    justifyContent: 'flex-end',
+  },
+  messageText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+  },
+  messageTime: {
+    fontSize: 10,
+    color: '#aaa',
+    marginTop: 5,
+    alignSelf: 'flex-end',
+  },
   modalActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -172,6 +223,16 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
+  receivedMessage: {
+    backgroundColor: '#E0E0E0', 
+    alignSelf: 'flex-start',
+    borderTopLeftRadius: 0,
+    marginRight: 50,
+  },
+  receivedMessageText: {
+    color: '#000000',
+    fontSize: 16,
+  },
   saveButton: {
     backgroundColor: '#6a874d',
     padding: 10,
@@ -194,6 +255,23 @@ const styles = StyleSheet.create({
     color: '#1B4332',
     marginVertical: 20,
   },
+  sendButton: {
+    backgroundColor: '#6a874d',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+  },
+  sendButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  sentMessage: {
+    backgroundColor: '#4CAF50',
+    alignSelf: 'flex-end',
+    borderTopRightRadius: 0,
+    marginLeft: 50,
+  },
   subtitle: {
     fontSize: 20,
     color: '#1B4332',
@@ -206,6 +284,22 @@ const styles = StyleSheet.create({
     color: '#1B4332',
     textAlign: 'center',
     marginTop: 0,
+  },
+  userItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  userName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  userRole: {
+    fontSize: 14,
+    color: '#555',
   },
 });
 
