@@ -228,7 +228,7 @@ function HomeLogin() {
             {renderButton('Crear y modificar asignaturas', 'book', () => {navigation.navigate('Subjects' as never)})}
             {renderButton('Crear y modificar cursos y semestres', 'calendar-check-o', () => {navigation.navigate('CourseSemester' as never)})}
             {renderButton('Calificar estudiantes', 'check-square-o', () => {navigation.navigate('Grades' as never)})}
-            {renderButton('Gestionar eventos', 'calendar', () => {navigation.navigate('Events' as never)})}
+            {renderButton('Agregar eventos', 'calendar', () => {navigation.navigate('Events' as never)})}
           </View>
         </>
         )}

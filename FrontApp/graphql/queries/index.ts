@@ -186,3 +186,32 @@ export const GET_RESPONSE_BY_ID = gql`
     }
   }
 `;
+
+export const GET_ALL_EVENTS = gql`
+  query GetAllEvents {
+    events {
+      id
+      creatorId
+      courseId
+      title
+      description
+      createdAt
+      dueDate
+    }
+  }
+`;
+
+export const GET_EVENT_BY_ID = gql`
+  query GetEventById($id: ID!) {
+    event(id: $id) {
+      id
+      creatorId
+      courseId
+      title
+      description
+      createdAt
+      dueDate
+    }
+  }
+`;
+

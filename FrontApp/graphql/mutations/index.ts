@@ -192,3 +192,35 @@ export const DELETE_FORM = gql`
     removeForm(id: $id)
   }
 `;
+
+export const CREATE_EVENT = gql`
+  mutation CreateEvent($createEventDto: CreateEventDto!) {
+    createEvent(createEventDto: $createEventDto) {
+      id
+      creatorId
+      courseId
+      title
+      description
+      createdAt
+      dueDate
+    }
+  }
+`;
+
+export const DELETE_EVENT = gql`
+  mutation RemoveEvent($id: ID!) {
+    removeEvent(id: $id)
+  }
+`;
+
+export const CREATE_RESPONSE = gql`
+  mutation CreateResponse($responseDto: ResponseDto!) {
+    createResponse(responseDto: $responseDto) {
+      id
+      formId
+      userId
+      answers
+      submittedAt
+    }
+  }
+`;

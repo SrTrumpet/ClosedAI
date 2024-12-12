@@ -2,11 +2,24 @@ import { StyleSheet, Dimensions } from 'react-native';
 
 const screenWidth = Dimensions.get('window').width;
 
-const styles = StyleSheet.create({
+const styles = StyleSheet.create({ 
+  button: {
+    backgroundColor: '#6a874d',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    width: '48%',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: 20,
+  },
   buttonText: {
-    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+    color: '#fff',
   },
   calendar: {
     width: screenWidth - 40,
@@ -15,18 +28,125 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   container: {
-    flex: 1,
-    backgroundColor: '#d1f7ab',
+    width: '90%',
     alignItems: 'center',
-    padding: 20,
-    width: '100%',
   },
-  modalButton: {
+  courseItem: {
+    padding: 10,
+    marginVertical: 5,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  courseItemSelected: {
+    backgroundColor: '#007BFF',
+  },
+  courseItemText: {
+    fontSize: 16,
+    color: '#000',
+  },
+  courseModalCloseButton: {
+    marginTop: 20,
     backgroundColor: '#6a874d',
     padding: 10,
     borderRadius: 5,
+  },
+  courseModalCloseButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  courseModalContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  courseModalContent: {
+    width: '80%',
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  courseModalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  courseModalEmptyText: {
+    fontSize: 16,
+    color: '#555',
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  courseSelectionButton: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+    marginTop: 10,
+  },
+  courseSelectionButtonText: {
+    fontSize: 16,
+    color: '#000',
+  },
+  courseModalItem: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    width: '100%',
+    textAlign: 'center',
+  },
+  errorText: {
+    fontSize: 16,
+    color: 'red',
+    textAlign: 'center',
+  },
+  eventCard: {
+    backgroundColor: '#fff',
+    padding: 15,
+    marginBottom: 10,
+    borderRadius: 10,
+    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+  },
+  eventDescription: {
+    fontSize: 14,
+    color: '#555',
     marginVertical: 5,
+  },
+  eventTime: {
+    fontSize: 12,
+    color: '#777',
+  },
+  eventTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  input: {
+    backgroundColor: '#fff',
+    width: '100%',
+    padding: 10,
+    marginVertical: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 5,
+  },
+  modalButton: {
+    backgroundColor: '#6a874d',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 20,
+    width: '48%',
   },
   modalContainer: {
     flex: 1,
@@ -49,8 +169,10 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    width: '100%',
     backgroundColor: '#d1f7ab',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 20,
   },
   selectedYearText: {
     fontSize: 18,

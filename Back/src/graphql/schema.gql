@@ -134,6 +134,30 @@ type Form {
   createdAt: DateTime!
 }
 
+"""Entity representing a form with questions"""
+type Event {
+  """Unique identifier of the event"""
+  id: ID!
+
+  """ID del creador"""
+  creatorId: Float!
+
+  """ID del curso"""
+  courseId: Float!
+
+  """Title of the form"""
+  title: String!
+
+  """Optional description of the form"""
+  description: String
+
+  """Date when the form was created"""
+  createdAt: DateTime!
+
+  """Date when the form has to be completed"""
+  dueDate: DateTime!
+}
+
 type Response {
   """Unique identifier of the form"""
   id: ID!
@@ -177,8 +201,6 @@ type Query {
   gradesByStudentIdAndSubjectId(studentId: Float!, subjectId: Float!): [GradeEntity!]!
   findGradeById(id: Float!): GradeEntity!
   getAllGrades: [GradeEntity!]!
-  getAllCourse: [CourseEntity!]!
-  getAllSemester: [SemesterEntity!]!
 
   """Fetch all forms"""
   forms: [Form!]!
@@ -186,9 +208,17 @@ type Query {
   """Fetch a form by ID"""
   form(id: ID!): Form
   getId(id: Float!): Float!
+
+  """Fetch all events"""
+  events: [Event!]!
+
+  """Fetch an event by ID"""
+  event(id: ID!): Event
   getAllResponses: [Response!]!
   getResponsesByFormId(formId: Float!): [Response!]!
   getResponseById(id: Float!): Response!
+  getAllCourse: [CourseEntity!]!
+  getAllSemester: [SemesterEntity!]!
 }
 
 type Mutation {
@@ -244,12 +274,6 @@ type Mutation {
   createGrade(createGradeDto: CreateGradeDto!): GradeEntity!
   updateGrade(id: Float!, updateGradeDto: UpdateGradeDto!): GradeEntity!
   deleteGrade(id: Float!): Boolean!
-  createCourse(createCourseDto: CreateCourseDto!): Boolean!
-  deleteCourseDto(deleteCourseDto: DeleteCourseDto!): Boolean!
-  updateCourseDto(updateCourseDto: UpdateCourseDto!): Boolean!
-  createSemester(createSemesterDto: CreateSemesterDto!): Boolean!
-  deleteSemester(deleteSemesterDto: DeleteSemesterDto!): Boolean!
-  updateSemester(updateSemesterDto: UpdateSemesterDto!): Boolean!
 
   """Create a new form"""
   createForm(createFormInput: CreateFormDto!): Form!
@@ -257,8 +281,20 @@ type Mutation {
   """Delete a form by ID"""
   removeForm(id: ID!): Boolean!
 
+  """Create a new event"""
+  createEvent(createEventDto: CreateEventDto!): Event!
+
+  """Delete an event by ID"""
+  removeEvent(id: ID!): Boolean!
+
   """Create a new response for a form"""
   createResponse(responseDto: ResponseDto!): Response!
+  createCourse(createCourseDto: CreateCourseDto!): Boolean!
+  deleteCourseDto(deleteCourseDto: DeleteCourseDto!): Boolean!
+  updateCourseDto(updateCourseDto: UpdateCourseDto!): Boolean!
+  createSemester(createSemesterDto: CreateSemesterDto!): Boolean!
+  deleteSemester(deleteSemesterDto: DeleteSemesterDto!): Boolean!
+  updateSemester(updateSemesterDto: UpdateSemesterDto!): Boolean!
 }
 
 input CreateUserDto {
@@ -318,6 +354,51 @@ input UpdateGradeDto {
   subjectId: Float
 }
 
+input CreateFormDto {
+  """ID of the user who submitted the form"""
+  creatorId: Float!
+
+  """ID of the course"""
+  courseId: Float!
+
+  """Title of the form"""
+  title: String!
+
+  """Optional description of the form"""
+  description: String
+
+  """List of questions in the form"""
+  questions: [String!]!
+}
+
+input CreateEventDto {
+  """ID of the user who submitted the form"""
+  creatorId: Float!
+
+  """ID of the course"""
+  courseId: Float!
+
+  """Title of the form"""
+  title: String!
+
+  """Optional description of the form"""
+  description: String
+
+  """Due date of the event"""
+  dueDate: DateTime!
+}
+
+input ResponseDto {
+  """ID of the user who submitted the response"""
+  userId: Float!
+
+  """ID of the form being answered"""
+  formId: Float!
+
+  """List of answers in the form"""
+  answers: [String!]!
+}
+
 input CreateCourseDto {
   nameCourse: String!
   level: CourseLevels!
@@ -352,32 +433,4 @@ input UpdateSemesterDto {
   startDate: DateTime
   endDate: DateTime
   deadline: DateTime
-}
-
-input CreateFormDto {
-  """ID of the user who submitted the form"""
-  creatorId: Float!
-
-  """ID of the course"""
-  courseId: Float!
-
-  """Title of the form"""
-  title: String!
-
-  """Optional description of the form"""
-  description: String
-
-  """List of questions in the form"""
-  questions: [String!]!
-}
-
-input ResponseDto {
-  """ID of the user who submitted the response"""
-  userId: Float!
-
-  """ID of the form being answered"""
-  formId: Float!
-
-  """List of answers in the form"""
-  answers: [String!]!
 }

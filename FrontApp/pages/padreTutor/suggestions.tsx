@@ -3,7 +3,7 @@ import { Text, View, TextInput, TouchableOpacity, ScrollView, Alert, KeyboardAvo
 import { useMutation, useQuery } from '@apollo/client';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Picker } from '@react-native-picker/picker';
-import { CREATE_FORM } from '../../graphql/mutations/index';
+import { CREATE_FORM, CREATE_EVENT } from '../../graphql/mutations/index';
 import { GET_USER_BY_RUT, GET_ALL_COURSES } from '../../graphql/queries/index';
 import { clientUser } from '../../graphql/apollo/apolloClient';
 import styles from '../../styles/padreTutor/suggestions.styles';
@@ -24,6 +24,9 @@ const SendFormScreen = () => {
   const [createForm, { loading, error }] = useMutation(CREATE_FORM, {client: clientUser});
   const { data: courseData } = useQuery(GET_ALL_COURSES, { client: clientUser });
   //console.log('courseData:', courseData); 
+
+  const [createEvent] = useMutation(CREATE_EVENT, { client: clientUser });
+
   useEffect(() => {
     const fetchCreatorID = async () => {
       try {
@@ -102,12 +105,30 @@ console.log("questions", questions);
           }
         }
       });
-      Alert.alert('Éxito', `Formulario creado: ${data.createForm.title}`);
+
+      const eventDueDate = new Date(); // Puedes personalizar la fecha de vencimiento del evento según tus necesidades
+      eventDueDate.setHours(eventDueDate.getHours() + 48); // Ejemplo de establecer la fecha de vencimiento en 48 horas
+
+      await createEvent({
+        variables: {
+          createEventDto: {
+            creatorId: parseFloat(creatorID),
+            courseId: parseFloat(courseID),
+            title: `Evento: ${data.createForm.title}`,
+            description: formDescription,
+            dueDate: eventDueDate.toISOString(),
+          },
+        },
+      });
+
+
+      Alert.alert('Éxito', `Formulario y evento creado: ${data.createForm.title}`);
       setTitle('');
       setDescription('');
       setQuestions(['']);
     } catch (error) {
       console.error('Unexpected error:', error);
+      Alert.alert('Error', 'Ocurrió un error al crear el formulario o el evento.');
     }
   };
 
@@ -182,7 +203,7 @@ console.log("questions", questions);
         <div class="header">
           <div class="school-name">Colegio Bajos del Cerro Pequeño</div>
           <div class="author-course">
-            <p><strong>Autor:</strong> ${firstName} ${lastName} }</p>
+            <p><strong>Autor:</strong> ${firstName} ${lastName} </p>
             <p><strong>Curso:</strong> ${selectedCourse || 'Sin curso'}</p>
           </div>
         </div>

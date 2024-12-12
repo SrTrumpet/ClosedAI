@@ -13,6 +13,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 import { PubSub } from 'graphql-subscriptions';
 import { FormsModule } from './form/forms.module';
+import { EventsModule } from './events/events.module';
 import { ResponsesModule } from './form/response.module';
 
 @Module({
@@ -23,6 +24,9 @@ import { ResponsesModule } from './form/response.module';
     AsistModule,
     SubjectModule,
     GradesModule,
+    FormsModule,
+    EventsModule,    
+    ResponsesModule,
     CourseModule,
     SemesterModule,
     FormsModule,
