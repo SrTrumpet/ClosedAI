@@ -230,6 +230,9 @@ type Query {
 
   """Fetch a chat by ID"""
   chat(id: ID!): Chat
+
+  """Fetch chats between two users"""
+  getMessages(senderId: Float!, receiverId: Float!): [Chat!]!
 }
 
 type Mutation {
