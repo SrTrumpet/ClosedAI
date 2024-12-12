@@ -15,6 +15,8 @@ import { PubSub } from 'graphql-subscriptions';
 import { FormsModule } from './form/forms.module';
 import { EventsModule } from './events/events.module';
 import { ResponsesModule } from './form/response.module';
+import { ChatsModule } from './chats/chat.module';
+
 
 @Module({
   imports: [
@@ -28,6 +30,7 @@ import { ResponsesModule } from './form/response.module';
     EventsModule,    
     ResponsesModule,
     CourseModule,
+    ChatsModule,
     SemesterModule,
     FormsModule,
     ResponsesModule,
@@ -51,16 +54,6 @@ import { ResponsesModule } from './form/response.module';
         req,
         ...(connection ? connection.context : {}),
       }),
-
-      // Configuración para WebSocket y suscripciones
-      subscriptions: {
-        'graphql-ws': { // WebSocket GraphQL subscriptions (Apollo Server 3.x+)
-          path: '/graphql',
-        },
-        'subscriptions-transport-ws': { // Legacy WebSocket transport para compatibilidad
-          path: '/graphql',
-        },
-      },
     }),
   ],
   providers: [

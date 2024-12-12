@@ -134,7 +134,28 @@ type Form {
   createdAt: DateTime!
 }
 
-"""Entity representing a form with questions"""
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+"""
+La entidad Grade que representa una calificación de un estudiante en una asignatura
+"""
+type GradeEntity {
+  id: ID!
+
+  """La nota obtenida"""
+  grade: Float!
+
+  """ID del estudiante"""
+  studentId: Float!
+
+  """ID de la asignatura"""
+  subjectId: Float!
+}
+
+"""Entity representing an event"""
 type Event {
   """Unique identifier of the event"""
   id: ID!
@@ -171,6 +192,24 @@ type Response {
   """List of answers in the form"""
   answers: [String!]!
   submittedAt: DateTime!
+}
+
+"""Entity representing a form with questions"""
+type Chat {
+  """Unique identifier of the chat"""
+  id: ID!
+
+  """ID del que envia"""
+  senderId: Float!
+
+  """ID del que manda"""
+  receiverId: Float!
+
+  """contenido del chat"""
+  content: String!
+
+  """Fecha que se envia el mensaje"""
+  createdAt: DateTime!
 }
 
 type Query {
@@ -219,6 +258,12 @@ type Query {
   getResponseById(id: Float!): Response!
   getAllCourse: [CourseEntity!]!
   getAllSemester: [SemesterEntity!]!
+
+  """Fetch all chats"""
+  chats: [Chat!]!
+
+  """Fetch a chat by ID"""
+  chat(id: ID!): Chat
 }
 
 type Mutation {
@@ -295,6 +340,12 @@ type Mutation {
   createSemester(createSemesterDto: CreateSemesterDto!): Boolean!
   deleteSemester(deleteSemesterDto: DeleteSemesterDto!): Boolean!
   updateSemester(updateSemesterDto: UpdateSemesterDto!): Boolean!
+
+  """Create a new chat"""
+  createChat(createChatDto: CreateChatDto!): Chat!
+
+  """Delete a chat by ID"""
+  removeChat(id: ID!): Boolean!
 }
 
 input CreateUserDto {
@@ -433,4 +484,15 @@ input UpdateSemesterDto {
   startDate: DateTime
   endDate: DateTime
   deadline: DateTime
+}
+
+input CreateChatDto {
+  """ID of the user that is sending the message"""
+  senderId: Float!
+
+  """ID of the user that is receiving the message"""
+  receiverId: Float!
+
+  """Content of the message"""
+  content: String!
 }
